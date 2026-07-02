@@ -9,7 +9,7 @@ import { routes } from './shared/routes';
 import { authMiddleware } from './shared/auth.middleware';
 import { initDatabase } from './shared/db';
 import { versionInfo } from './config/version';
-import { metricsHandler } from './metrics/metrics';
+import { metricsHandler, observeRequestDuration } from './metrics/metrics';
 
 dotenv.config();
 
@@ -20,6 +20,16 @@ app.use(helmet());
 app.use(cors());
 app.use(json());
 app.use(morgan('combined'));
+
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
+    const routePath = req.route?.path ? `${req.baseUrl}${req.route.path}` : req.baseUrl || req.path;
+    observeRequestDuration(req.method, routePath || req.path, res.statusCode, durationMs);
+  });
+  next();
+});
 
 app.get('/', (_req, res) => res.json({ status: 'Dmonitor service is running', version: versionInfo }));
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));

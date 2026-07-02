@@ -1,6 +1,9 @@
 export interface ReadingPayload {
   patientId: string;
+  clinicId?: string;
   timestamp: string;
+  clientTimestamp?: string;
+  offlineUploadId?: string;
   glucoseValue: number;
   units: 'mg/dL' | 'mmol/L';
   deviceId?: string;
@@ -11,6 +14,10 @@ export interface ReadingPayload {
     exerciseMinutes?: number;
     notes?: string;
   };
+}
+
+export interface ReadingBatchPayload {
+  readings: ReadingPayload[];
 }
 
 export function validateReadingPayload(payload: unknown): string[] {
@@ -24,8 +31,17 @@ export function validateReadingPayload(payload: unknown): string[] {
   if (!body.patientId || typeof body.patientId !== 'string') {
     errors.push('patientId is required and must be a string');
   }
+  if (body.clinicId !== undefined && typeof body.clinicId !== 'string') {
+    errors.push('clinicId must be a string when provided');
+  }
   if (!body.timestamp || typeof body.timestamp !== 'string' || Number.isNaN(Date.parse(body.timestamp))) {
     errors.push('timestamp is required and must be a valid ISO timestamp');
+  }
+  if (body.clientTimestamp !== undefined && (typeof body.clientTimestamp !== 'string' || Number.isNaN(Date.parse(body.clientTimestamp)))) {
+    errors.push('clientTimestamp must be a valid ISO timestamp when provided');
+  }
+  if (body.offlineUploadId !== undefined && typeof body.offlineUploadId !== 'string') {
+    errors.push('offlineUploadId must be a string when provided');
   }
   if (typeof body.glucoseValue !== 'number') {
     errors.push('glucoseValue is required and must be a number');
@@ -48,6 +64,30 @@ export function validateReadingPayload(payload: unknown): string[] {
       errors.push('context.symptoms must be an array of strings');
     }
   }
+
+  return errors;
+}
+
+export function validateReadingBatchPayload(payload: unknown): string[] {
+  const errors: string[] = [];
+
+  if (!payload || typeof payload !== 'object') {
+    errors.push('Payload must be an object with a readings array');
+    return errors;
+  }
+
+  const body = payload as Partial<ReadingBatchPayload>;
+  if (!Array.isArray(body.readings) || body.readings.length === 0) {
+    errors.push('readings is required and must be a non-empty array');
+    return errors;
+  }
+
+  body.readings.forEach((reading, index) => {
+    const readingErrors = validateReadingPayload(reading);
+    readingErrors.forEach((readingError) => {
+      errors.push(`readings[${index}].${readingError}`);
+    });
+  });
 
   return errors;
 }

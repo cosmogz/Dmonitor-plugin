@@ -14,4 +14,6 @@ export const config = {
   openmrsGlucoseConcept: process.env.OPENMRS_GLUCOSE_CONCEPT || '',
   openmrsEncounterTypeUuid: process.env.OPENMRS_ENCOUNTER_TYPE_UUID || '',
   openmrsLocationUuid: process.env.OPENMRS_LOCATION_UUID || '',
+  gatewayBaseUrl: process.env.GATEWAY_BASE_URL || '',
+  gatewayApiKey: process.env.GATEWAY_API_KEY || '',
 };

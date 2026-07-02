@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "n": "tZxCtOJhW_BgKw_48reXBg9smXyVH1rSFNK3_YYkMNCUR99Vw1kn_3kzFdJkX1j_HLq7u-0QRh3caQhmbbzjapw2MxVkABWSNFTxxNOnYLqwPqzR9D_JzXl0TQktlPOk3do_N35Q75k9_y_aUQqDyekr0tKCZIjHMAySN0ri26WDXc_M2rG36Ef98lO-TrQGWRC_PezFKcIF-N0wtkFJnpRv-87R259TEKk_ndzb9o2GXCbGuwWOIsiolSISTz1qA_iHuoOP0TQz9r6_Glb4xr7aRqkfR0YwRx7TV1dL-Qw31Ml4Xm33UFU3RdsLaDnQwLx2p48dcVpiiUwjPmXzBQ",
+      "e": "AQAB",
+      "kid": "dmonitor-key-1",
+      "alg": "RS256",
+      "use": "sig"
+    }
+  ]
+}

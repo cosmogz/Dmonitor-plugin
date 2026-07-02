@@ -14,6 +14,18 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
       on: () => {},
       connect: async () => {},
       disconnect: async () => {},
+      lPush: async (k: string, value: any) => {
+        const current = Array.isArray(store.get(k)) ? store.get(k) : [];
+        current.unshift(value);
+        store.set(k, current);
+        return current.length;
+      },
+      rPop: async (k: string) => {
+        const current = Array.isArray(store.get(k)) ? store.get(k) : [];
+        const value = current.pop();
+        store.set(k, current);
+        return value ?? null;
+      },
       exists: async (k: string) => (store.has(k) ? 1 : 0),
       incr: async (k: string) => {
         const v = Number(store.get(k) || 0) + 1;
