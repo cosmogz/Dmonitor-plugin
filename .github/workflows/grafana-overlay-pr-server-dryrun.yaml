@@ -207,7 +207,19 @@ jobs:
               console.log('No pull request context; skipping comment');
               return;
             }
-            const result = needs['pr-server-dryrun'].result || 'unknown';
+            // Determine the server dry-run job result via the Actions API (needs is not available here)
+            let result = 'unknown';
+            try {
+              const { data: jobsResp } = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: context.runId,
+              });
+              const job = (jobsResp && jobsResp.jobs) ? jobsResp.jobs.find(j => j.name === 'pr-server-dryrun') : undefined;
+              if (job && job.conclusion) result = job.conclusion;
+            } catch (e) {
+              console.log('Could not determine job result:', e.message || e);
+            }
             const conclusion = (result === 'success') ? 'succeeded' : 'failed or had issues';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const fs = require('fs');
