@@ -25,6 +25,7 @@ jobs:
       - name: Validate overlays (kubectl kustomize + kubectl dry-run)
         run: |
           set -e
+          export KUBECONFIG=/dev/null
           for overlay in manifests/grafana/overlay manifests/grafana/overlay/examples/official manifests/grafana/overlay/examples/bitnami; do
             echo "\n=== Validating $overlay ==="
             kubectl kustomize "$overlay" | kubectl apply --dry-run=client -f -
