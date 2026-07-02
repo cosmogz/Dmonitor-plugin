@@ -23,13 +23,7 @@ jobs:
           sudo mv kubectl /usr/local/bin/
           kubectl version --client
 
-      - name: Install kustomize
-        run: |
-          set -e
-          KUSTOMIZE_VERSION=v5.1.0
-          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION#v}_linux_amd64.tar.gz" | tar xz
-          sudo mv kustomize /usr/local/bin/
-          kustomize version
+      # Use kubectl kustomize to avoid unreliable kustomize tarball installs
 
       - name: Determine cloud provider
         id: cloud
@@ -117,7 +111,7 @@ jobs:
               logfile="$GITHUB_WORKSPACE/overlay-${name}.log"
               rm -f "$logfile" || true
               echo "=== Server-side dry-run for $overlay ===" | tee -a "$logfile"
-              if kustomize build "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
+              if kubectl kustomize "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
                 echo "Server-side dry-run for $overlay succeeded" | tee -a "$logfile"
               else
                 echo "Server-side dry-run for $overlay FAILED" | tee -a "$logfile"
