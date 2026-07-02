@@ -28,7 +28,9 @@ jobs:
       - name: Determine cloud provider
         id: cloud
         run: |
-          echo "cloud=${{ secrets.CLOUD_PROVIDER || 'aws' }}" >> $GITHUB_OUTPUT
+          # Default to 'none' so the job doesn't attempt cluster auth in CI
+          echo "cloud=${{ secrets.CLOUD_PROVIDER || 'none' }}" >> $GITHUB_OUTPUT
+          echo "CLOUD=${{ secrets.CLOUD_PROVIDER || 'none' }}" >> $GITHUB_ENV
 
       - name: Authenticate to cluster (AWS EKS)
         if: ${{ steps.cloud.outputs.cloud == 'aws' }}
@@ -111,10 +113,19 @@ jobs:
               logfile="$GITHUB_WORKSPACE/overlay-${name}.log"
               rm -f "$logfile" || true
               echo "=== Server-side dry-run for $overlay ===" | tee -a "$logfile"
-              if kubectl kustomize "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
-                echo "Server-side dry-run for $overlay succeeded" | tee -a "$logfile"
+              if [ "$CLOUD" = "none" ]; then
+                echo "No cloud configured; running local kustomize build (kubectl kustomize)" | tee -a "$logfile"
+                if kubectl kustomize "$overlay" 2>&1 | tee -a "$logfile"; then
+                  echo "Local kustomize build for $overlay succeeded" | tee -a "$logfile"
+                else
+                  echo "Local kustomize build for $overlay FAILED" | tee -a "$logfile"
+                fi
               else
-                echo "Server-side dry-run for $overlay FAILED" | tee -a "$logfile"
+                if kubectl kustomize "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
+                  echo "Server-side dry-run for $overlay succeeded" | tee -a "$logfile"
+                else
+                  echo "Server-side dry-run for $overlay FAILED" | tee -a "$logfile"
+                fi
               fi
             else
               echo "Skipping missing overlay: $overlay"
