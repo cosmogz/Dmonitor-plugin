@@ -1,0 +1,33 @@
+name: Validate Grafana overlays
+
+on:
+  push:
+    paths:
+      - 'manifests/grafana/**'
+  pull_request:
+    paths:
+      - 'manifests/grafana/**'
+
+jobs:
+  validate-overlays:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: '1.26.0'
+      - name: Install kustomize
+        run: |
+          set -e
+          KUSTOMIZE_VERSION=v5.1.0
+          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION#v}_linux_amd64.tar.gz" | tar xz
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+      - name: Validate overlays (kustomize build + kubectl dry-run)
+        run: |
+          set -e
+          for overlay in manifests/grafana/overlay manifests/grafana/overlay/examples/official manifests/grafana/overlay/examples/bitnami; do
+            echo "\n=== Validating $overlay ==="
+            kustomize build "$overlay" | kubectl apply --dry-run=client -f -
+          done

@@ -1,0 +1,91 @@
+name: Grafana Overlay Server Dry-Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      cloud:
+        description: 'Cloud provider (aws or gcp)'
+        required: true
+        default: 'aws'
+      overlay:
+        description: 'Overlay to validate (official|bitnami|custom)'
+        required: true
+        default: 'official'
+      custom_overlay_path:
+        description: 'If overlay=custom, provide a path (repo-relative)'
+        required: false
+
+jobs:
+  server-dryrun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: '1.26.0'
+
+      - name: Install kustomize
+        run: |
+          set -e
+          KUSTOMIZE_VERSION=v5.1.0
+          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION#v}_linux_amd64.tar.gz" | tar xz
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
+      - name: Determine overlay path
+        id: overlay
+        run: |
+          set -e
+          case "${{ github.event.inputs.overlay }}" in
+            official)
+              echo "path=manifests/grafana/overlay/examples/official" >> $GITHUB_OUTPUT
+              ;;
+            bitnami)
+              echo "path=manifests/grafana/overlay/examples/bitnami" >> $GITHUB_OUTPUT
+              ;;
+            custom)
+              if [ -z "${{ github.event.inputs.custom_overlay_path }}" ]; then
+                echo "error: custom overlay path must be provided when overlay=custom" >&2
+                exit 1
+              fi
+              echo "path=${{ github.event.inputs.custom_overlay_path }}" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "error: unknown overlay '${{ github.event.inputs.overlay }}'" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Authenticate to cluster (AWS EKS)
+        if: ${{ github.event.inputs.cloud == 'aws' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        if: ${{ github.event.inputs.cloud == 'aws' }}
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
+      - name: Authenticate to cluster (GCP GKE)
+        if: ${{ github.event.inputs.cloud == 'gcp' }}
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Get GKE credentials
+        if: ${{ github.event.inputs.cloud == 'gcp' }}
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.GCP_PROJECT }}
+
+      - name: Run server-side dry-run for overlay
+        env:
+          OVERLAY_PATH: ${{ steps.overlay.outputs.path }}
+        run: |
+          set -e
+          echo "Validating overlay at $OVERLAY_PATH with server-side dry-run"
+          kustomize build "$OVERLAY_PATH" | kubectl apply --server-dry-run=server -f -

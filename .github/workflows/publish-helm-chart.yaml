@@ -1,0 +1,39 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'charts/dmonitor/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+      - name: Package chart
+        run: |
+          mkdir -p artifacts
+          helm package charts/dmonitor -d artifacts
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "helm-chart-${{ github.run_id }}"
+          release_name: "dmonitor-helm-${{ github.run_id }}"
+          body: "Automated Helm chart package for dmonitor"
+          draft: false
+          prerelease: false
+      - name: Upload chart to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/*.tgz
+          asset_name: dmonitor-chart.tgz
+          asset_content_type: application/gzip

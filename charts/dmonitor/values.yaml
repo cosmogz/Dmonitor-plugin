@@ -1,0 +1,39 @@
+replicaCount: 2
+image:
+  repository: cosmogz/dmonitor
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 3000
+metrics:
+  path: /metrics
+  port: http
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+probes:
+  liveness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readiness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+nodeSelector: {}
+tolerations: []
+affinity: {}

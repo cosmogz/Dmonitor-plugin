@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-dmonitor
+  namespace: monitoring
+  labels:
+    app: grafana-dmonitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-dmonitor
+  template:
+    metadata:
+      labels:
+        app: grafana-dmonitor
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:9.5.3
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: grafana-provisioning
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: grafana-dashboards
+              mountPath: /var/lib/grafana/dashboards
+      volumes:
+        - name: grafana-provisioning
+          configMap:
+            name: grafana-provisioning
+        - name: grafana-dashboards
+          configMap:
+            name: grafana-dashboards
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-dmonitor
+  namespace: monitoring
+spec:
+  selector:
+    app: grafana-dmonitor
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP

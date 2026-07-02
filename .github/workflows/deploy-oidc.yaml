@@ -1,0 +1,48 @@
+name: Deploy to Kubernetes (OIDC)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-eks:
+    name: Deploy to EKS via OIDC
+    runs-on: ubuntu-latest
+    if: contains(vars.CLOUD_PROVIDER, 'aws')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+      - name: Deploy Helm chart
+        run: |
+          helm upgrade --install dmonitor charts/dmonitor -n default --create-namespace
+
+  deploy-gke:
+    name: Deploy to GKE via Workload Identity
+    runs-on: ubuntu-latest
+    if: contains(vars.CLOUD_PROVIDER, 'gcp')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to GCP via OIDC
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Get credentials for GKE
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.GCP_PROJECT }}
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+      - name: Deploy Helm chart
+        run: |
+          helm upgrade --install dmonitor charts/dmonitor -n default --create-namespace

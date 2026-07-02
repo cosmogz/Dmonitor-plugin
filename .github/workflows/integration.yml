@@ -1,0 +1,89 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: dmonitor
+          POSTGRES_PASSWORD: dmonitor
+          POSTGRES_DB: dmonitor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dmonitor" --health-interval=5s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_URL: postgresql://dmonitor:dmonitor@localhost:5432/dmonitor
+      REDIS_URL: redis://localhost:6379
+      JWKS_URI: http://localhost:4000/.well-known/jwks.json
+      JWT_ISSUER: http://auth.test/
+      JWT_AUDIENCE: dmonitor-service
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm ci
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 && break || sleep 1
+          done
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: npm run migrate
+      - name: Start mock JWKS server
+        run: |
+          node scripts/mock-jwks-server.js &
+          echo $! > jwks.pid
+          sleep 1
+      - name: Build
+        run: npm run build
+      - name: Start server
+        run: |
+          node dist/main.js &
+          echo $! > server.pid
+      - name: Generate integration JWT
+        id: genjwt
+        run: |
+          TOKEN=$(node scripts/generate-jwt.js)
+          echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+      - name: Wait for health
+        run: |
+          for i in {1..30}; do
+            curl -sS http://localhost:3000/health | grep -q ok && break || sleep 1
+          done
+      - name: Integration: create patient link
+        run: |
+          curl -s -X POST http://localhost:3000/api/v1/patients/link -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"patientId":"patient-123","nationalId":"NAT-123","name":"Test Patient"}'
+      - name: Integration: send reading
+        run: |
+          curl -s -X POST http://localhost:3000/api/v1/readings -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"patientId":"patient-123","timestamp":"2026-07-02T12:00:00.000Z","glucoseValue":12.5,"units":"mmol/L"}'
+      - name: Integration: fetch alerts
+        run: |
+          curl -s http://localhost:3000/api/v1/alerts?patientId=patient-123 -H "Authorization: Bearer $TOKEN"
+      - name: Stop server
+        run: |
+          kill "$(cat server.pid)" || true
+      - name: Stop mock JWKS
+        run: |
+          kill "$(cat jwks.pid)" || true
+*** End Patch

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmonitor
+  namespace: default
+  labels:
+    app: dmonitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dmonitor
+  template:
+    metadata:
+      labels:
+        app: dmonitor
+    spec:
+      serviceAccountName: dmonitor-sa
+      containers:
+        - name: dmonitor
+          # Replace the image with your build image
+          image: cosmogz/dmonitor:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"

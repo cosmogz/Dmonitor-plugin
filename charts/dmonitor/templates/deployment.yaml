@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dmonitor.fullname" . }}
+  labels:
+    app: {{ include "dmonitor.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "dmonitor.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "dmonitor.name" . }}
+    spec:
+      serviceAccountName: dmonitor-sa
+      containers:
+        - name: dmonitor
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.service.port }}"
+          {{- if .Values.probes.liveness }}
+          livenessProbe:
+{{ toYaml .Values.probes.liveness | indent 12 }}
+          {{- end }}
+          {{- if .Values.probes.readiness }}
+          readinessProbe:
+{{ toYaml .Values.probes.readiness | indent 12 }}
+          {{- end }}
