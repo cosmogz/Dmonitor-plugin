@@ -8,7 +8,10 @@
     "dev": "NODE_ENV=development nodemon --watch src --exec node src/index.js",
     "migrate": "node scripts/migrate.js",
     "migrate:down": "echo 'manual rollback required'",
-    "lint": "echo 'no lint configured'"
+    "lint": "echo 'no lint configured'",
+    "worker:openmrs": "node src/openmrs/worker.js",
+    "test": "jest",
+    "test:integration": "jest __tests__/integration.openmrs.test.js --runInBand"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -16,6 +19,7 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.10.0",
     "axios": "^1.4.0",
+    "ioredis": "^5.3.2",
     "pino": "^8.18.0"
   },
   "devDependencies": {
@@ -28,4 +32,6 @@
     "testEnvironment": "node",
     "testTimeout": 10000
   }
+  ,
+  
 }

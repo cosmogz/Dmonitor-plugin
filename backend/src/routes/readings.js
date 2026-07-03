@@ -45,14 +45,26 @@ router.post('/', async (req, res) => {
       JSON.stringify({ patient_external_id, value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() })
     ]);
 
-    // Fire-and-forget: try to send to OpenMRS if configured
-    (async () => {
+    // Enqueue for OpenMRS delivery: prefer Redis queue if available, else attempt async send
+    const job = { patient_external_id, reading: { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() }, attempts: 0 };
+    const REDIS_URL = process.env.REDIS_URL || '';
+    if (REDIS_URL) {
       try {
-        await openmrs.sendObservation(patient_external_id, { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() });
+        const Redis = require('ioredis');
+        const r = new Redis(REDIS_URL);
+        await r.rpush('openmrs:queue', JSON.stringify(job));
+        r.disconnect();
       } catch (err) {
-        console.error('OpenMRS send failed (non-fatal):', err.message || err);
+        console.error('Failed to enqueue OpenMRS job, falling back to async send:', err.message || err);
+        (async () => {
+          try { await openmrs.sendObservation(patient_external_id, job.reading); } catch (e) { console.error('OpenMRS send failed (non-fatal):', e.message || e); }
+        })();
       }
-    })();
+    } else {
+      (async () => {
+        try { await openmrs.sendObservation(patient_external_id, job.reading); } catch (e) { console.error('OpenMRS send failed (non-fatal):', e.message || e); }
+      })();
+    }
 
     res.status(201).json({ id: readingId, created_at: insert.rows[0].created_at });
   } catch (err) {
