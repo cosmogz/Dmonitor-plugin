@@ -39,7 +39,29 @@ async function deliverEmail(notification, p) {
   const DEFAULT_TO = process.env.NOTIFICATION_DEFAULT_EMAIL || '';
   if (!SMTP_URL) throw new Error('no SMTP configured');
 
-  const transporter = nodemailer.createTransport(SMTP_URL);
+  let transportOpts;
+  if (typeof SMTP_URL === 'string') {
+    try {
+      const u = new URL(SMTP_URL);
+      if (u.protocol.startsWith('smtp')) {
+        // prefer explicit host/port config for local servers
+        transportOpts = { host: u.hostname, port: parseInt(u.port || '25', 10), secure: u.protocol === 'smtps' };
+      } else {
+        transportOpts = { url: SMTP_URL };
+      }
+    } catch (e) {
+      transportOpts = { url: SMTP_URL };
+    }
+  } else {
+    transportOpts = SMTP_URL;
+  }
+
+  // In test environments or when explicitly allowed, disable TLS verification to accept self-signed certs
+  if (process.env.NODE_ENV === 'test' || process.env.SMTP_ALLOW_INSECURE === 'true') {
+    transportOpts.tls = Object.assign({}, transportOpts.tls || {}, { rejectUnauthorized: false });
+  }
+
+  const transporter = nodemailer.createTransport(transportOpts);
   const to = (notification && notification.to) || DEFAULT_TO;
   if (!to) throw new Error('no recipient email configured');
 
