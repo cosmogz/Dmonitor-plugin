@@ -21,28 +21,6 @@ spec:
         - name: dmonitor
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh","-c","sleep 3600"]
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "dmonitor.fullname" . }}
-  labels:
-    app: {{ include "dmonitor.name" . }}
-spec:
-  replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      app: {{ include "dmonitor.name" . }}
-  template:
-    metadata:
-      labels:
-        app: {{ include "dmonitor.name" . }}
-    spec:
-      serviceAccountName: dmonitor-sa
-      containers:
-        - name: dmonitor
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

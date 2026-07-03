@@ -42,6 +42,72 @@ If you use the ExternalSecrets operator, the chart can create an `ExternalSecret
 
 Important: Creating ExternalSecrets from the chart is convenient for demos but in production you may want to manage them separately with proper RBAC and secret store configurations.
 
+SecretStore provider examples
+----------------------------
+
+Below are example `SecretStore` / `ClusterSecretStore` snippets for common providers. These are just examples — you must create the `SecretStore` in the cluster and configure provider credentials according to your environment.
+
+AWS Secrets Manager (ClusterSecretStore):
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+	name: aws-secrets-manager
+spec:
+	provider:
+		aws:
+			service: SecretsManager
+			region: us-east-1
+			auth:
+				secretRef:
+					accessKeyIDSecretRef:
+						name: aws-creds
+						key: accessKeyID
+					secretAccessKeySecretRef:
+						name: aws-creds
+						key: secretAccessKey
+```
+
+HashiCorp Vault (SecretStore):
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+	name: vault-store
+spec:
+	provider:
+		vault:
+			server: https://vault.example.com
+			path: secret
+			version: "v2"
+			auth:
+				token:
+					secretRef:
+						name: vault-token
+						key: token
+```
+
+GCP Secret Manager (ClusterSecretStore):
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+	name: gcp-sm
+spec:
+	provider:
+		gcp:
+			projectID: my-gcp-project
+			auth:
+				secretRef:
+					name: gcp-sa
+					key: service-account.json
+```
+
+Refer to the ExternalSecrets operator documentation for provider-specific configuration and supported auth methods.
+
 Dmonitor Helm chart
 
 Usage:
