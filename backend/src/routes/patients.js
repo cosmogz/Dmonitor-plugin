@@ -44,4 +44,48 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Recent readings for a patient (paginated)
+router.get('/:id/readings', async (req, res) => {
+  const patientId = Number(req.params.id);
+  if (!patientId) return res.status(400).json({ error: 'invalid patient id' });
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const offset = Math.max(Number(req.query.offset) || 0, 0);
+  const since = req.query.since ? new Date(req.query.since) : null;
+  if (since && isNaN(since.getTime())) return res.status(400).json({ error: 'invalid since timestamp' });
+  try {
+    let q, params;
+    if (since) {
+      q = 'SELECT * FROM readings WHERE patient_id=$1 AND recorded_at>=$2 ORDER BY recorded_at DESC LIMIT $3 OFFSET $4';
+      params = [patientId, since.toISOString(), limit, offset];
+    } else {
+      q = 'SELECT * FROM readings WHERE patient_id=$1 ORDER BY recorded_at DESC LIMIT $2 OFFSET $3';
+      params = [patientId, limit, offset];
+    }
+    const r = await db.query(q, params);
+    res.json({ readings: r.rows, limit, offset });
+  } catch (err) {
+    console.error('patient readings error', err.message || err);
+    res.status(500).json({ error: 'internal error' });
+  }
+});
+
+// Alerts for a patient (paginated, optional ?unresolved=true)
+router.get('/:id/alerts', async (req, res) => {
+  const patientId = Number(req.params.id);
+  if (!patientId) return res.status(400).json({ error: 'invalid patient id' });
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const offset = Math.max(Number(req.query.offset) || 0, 0);
+  const unresolved = req.query.unresolved === 'true';
+  try {
+    const q = unresolved
+      ? 'SELECT * FROM alerts WHERE patient_id=$1 AND resolved=FALSE ORDER BY created_at DESC LIMIT $2 OFFSET $3'
+      : 'SELECT * FROM alerts WHERE patient_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3';
+    const r = await db.query(q, [patientId, limit, offset]);
+    res.json({ alerts: r.rows, limit, offset });
+  } catch (err) {
+    console.error('patient alerts error', err.message || err);
+    res.status(500).json({ error: 'internal error' });
+  }
+});
+
 module.exports = router;
