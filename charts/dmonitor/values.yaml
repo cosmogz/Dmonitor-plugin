@@ -1,85 +1,22 @@
-replicaCount: 1
-
-image:
-  repository: busybox
-  tag: "1.36"
-  pullPolicy: IfNotPresent
-
-service:
-  type: ClusterIP
-  port: 80
-
-resources: {}
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-# OIDC / OAuth configuration (for Grafana or app auth)
-# Enable and configure OIDC provider details below. Secrets are expected
-# to be provided via existing Kubernetes Secrets or set `clientSecret.create`.
-oidc:
-  enabled: false
-  provider: "generic"
-  issuerUrl: ""
-  clientID: ""
-  # Do not put secrets here in plaintext. Prefer creating a K8s secret and
-  # referencing it below. Set clientSecret.create=true to create a secret
-  # from the provided value (not recommended for production).
-  clientSecret:
-    create: false
-    # value: "" # Optional: secret value to create (not recommended)
-    secretName: ""
-    secretKey: "client-secret"
-  redirectURI: ""
-  scopes:
-    - openid
-    - profile
-    - email
-  tlsSkipVerify: false
-
-# Grafana provisioning (provisioning by configmaps)
-provisioning:
-  enabled: false
-  # providerConfig: raw YAML content for grafana provisioning providers file
-  providerConfig: |-
-    apiVersion: 1
-    providers: []
-  # dashboards: map of filename -> JSON/YAML content
-  dashboards: {}
-
-# ExternalSecrets integration (ExternalSecrets operator required)
-externalSecrets:
-  enabled: false
-  # Name of the SecretStore or ClusterSecretStore to reference
-  secretStoreName: "my-secret-store"
-  # Kind: "SecretStore" or "ClusterSecretStore"
-  secretStoreKind: "SecretStore"
-  # When true the chart will create an ExternalSecret resource to populate
-  # the Kubernetes Secret named in `oidc.clientSecret.secretName` from the
-  # external secret store. Prefer creating ExternalSecrets separately in
-  # production and leave this disabled.
-  createExternalSecret: false
-  # remoteKey to fetch from the external store; chart will use this when creating ExternalSecret
-  remoteKeyPrefix: "dmonitor/"
-
-
 replicaCount: 2
+
 image:
   repository: cosmogz/dmonitor
   tag: latest
   pullPolicy: IfNotPresent
+  imagePullSecrets: []
+
 service:
   type: ClusterIP
   port: 3000
+
 metrics:
   path: /metrics
   port: http
   serviceMonitor:
     enabled: true
     namespace: monitoring
+
 resources:
   requests:
     cpu: 50m
@@ -87,6 +24,7 @@ resources:
   limits:
     cpu: 250m
     memory: 256Mi
+
 probes:
   liveness:
     httpGet:
@@ -102,6 +40,45 @@ probes:
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 3
+
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+# ServiceAccount
+serviceAccount:
+  create: false
+  name: ""
+
+# OIDC / OAuth configuration (for Grafana or app auth)
+oidc:
+  enabled: false
+  provider: "generic"
+  issuerUrl: ""
+  clientID: ""
+  clientSecret:
+    create: false
+    secretName: ""
+    secretKey: "client-secret"
+  redirectURI: ""
+  scopes:
+    - openid
+    - profile
+    - email
+  tlsSkipVerify: false
+
+# Grafana provisioning (provisioning by configmaps)
+provisioning:
+  enabled: false
+  providerConfig: |-
+    apiVersion: 1
+    providers: []
+  dashboards: {}
+
+# ExternalSecrets integration (ExternalSecrets operator required)
+externalSecrets:
+  enabled: false
+  secretStoreName: "my-secret-store"
+  secretStoreKind: "SecretStore"
+  createExternalSecret: false
+  remoteKeyPrefix: "dmonitor/"

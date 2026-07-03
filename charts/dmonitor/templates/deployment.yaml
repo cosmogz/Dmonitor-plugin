@@ -17,6 +17,9 @@ spec:
         app.kubernetes.io/name: {{ include "dmonitor.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{- if .Values.serviceAccount.create }}{{ default (include "dmonitor.fullname" . ) .Values.serviceAccount.name }}{{- end }}
+      imagePullSecrets:
+        {{- toYaml .Values.image.imagePullSecrets | nindent 8 }}
       containers:
         - name: dmonitor
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -24,6 +27,8 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
           env:
             - name: PORT
               value: "{{ .Values.service.port }}"
@@ -65,3 +70,9 @@ spec:
             name: {{ include "dmonitor.fullname" . }}-grafana-dashboards
         {{- end }}
       {{- end }}
+      nodeSelector:
+    {{ toYaml .Values.nodeSelector | indent 6 }}
+      tolerations:
+    {{ toYaml .Values.tolerations | indent 6 }}
+      affinity:
+    {{ toYaml .Values.affinity | indent 6 }}
