@@ -1,0 +1,314 @@
+name: PR Grafana Overlay Server Dry-Run
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'manifests/grafana/**'
+      - 'manifests/grafana/overlay/**'
+      - 'manifests/grafana/overlay/examples/**'
+
+jobs:
+  pr-server-dryrun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          set -e
+          KUBECTL_VERSION=v1.26.0
+          curl -fsSL -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+
+      # Use kubectl kustomize to avoid unreliable kustomize tarball installs
+
+      - name: Determine cloud provider
+        id: cloud
+        run: |
+          # Default to 'none' so the job doesn't attempt cluster auth in CI
+          echo "cloud=${{ secrets.CLOUD_PROVIDER || 'none' }}" >> $GITHUB_OUTPUT
+          echo "CLOUD=${{ secrets.CLOUD_PROVIDER || 'none' }}" >> $GITHUB_ENV
+
+      - name: Authenticate to cluster (AWS EKS)
+        if: ${{ steps.cloud.outputs.cloud == 'aws' }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        if: ${{ steps.cloud.outputs.cloud == 'aws' }}
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
+      - name: Authenticate to cluster (GCP GKE)
+        if: ${{ steps.cloud.outputs.cloud == 'gcp' }}
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Get GKE credentials
+        if: ${{ steps.cloud.outputs.cloud == 'gcp' }}
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.GCP_PROJECT }}
+
+      - name: Sanity check CRDs required by overlays
+        run: |
+          set -e
+          LOGFILE="$GITHUB_WORKSPACE/crd-check.log"
+          rm -f "$LOGFILE" || true
+          touch "$LOGFILE"
+          # Skip the CRD sanity check when running local builds (no cloud configured)
+          if [ "${CLOUD:-none}" = "none" ]; then
+            echo "CLOUD=none detected; skipping CRD sanity check." | tee -a "$LOGFILE"
+          else
+            echo "Starting CRD sanity check" | tee -a "$LOGFILE"
+            CRDS=(
+              servicemonitors.monitoring.coreos.com
+              prometheusrules.monitoring.coreos.com
+              podmonitors.monitoring.coreos.com
+              externalsecrets.external-secrets.io
+            )
+            MISSING=()
+            for crd in "${CRDS[@]}"; do
+              if ! kubectl get crd "$crd" >/dev/null 2>&1; then
+                MISSING+=("$crd")
+              fi
+            done
+            if [ ${#MISSING[@]} -ne 0 ]; then
+              echo "Missing required CRDs: ${MISSING[*]}" | tee -a "$LOGFILE"
+              echo "Install the corresponding operators (Prometheus Operator, ExternalSecrets) in the staging cluster before running this check." | tee -a "$LOGFILE"
+            else
+              echo "All required CRDs present." | tee -a "$LOGFILE"
+            fi
+          fi
+      - name: Upload CRD check log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crd-check
+          path: ${{ github.workspace }}/crd-check.log
+
+      - name: Server-side dry-run overlays
+        run: |
+          set -e
+          echo "Starting server-side dry-run for overlays"
+          OVERLAYS=(
+            manifests/grafana/overlay
+            manifests/grafana/overlay/examples/official
+            manifests/grafana/overlay/examples/bitnami
+          )
+          for overlay in "${OVERLAYS[@]}"; do
+            if [ -d "$overlay" ]; then
+              case "$overlay" in
+                */examples/official)
+                  name="official"
+                  ;;
+                */examples/bitnami)
+                  name="bitnami"
+                  ;;
+                *)
+                  name="base"
+                  ;;
+              esac
+              logfile="$GITHUB_WORKSPACE/overlay-${name}.log"
+              rm -f "$logfile" || true
+              echo "=== Server-side dry-run for $overlay ===" | tee -a "$logfile"
+              if [ "$CLOUD" = "none" ]; then
+                echo "No cloud configured; running local kustomize build (kubectl kustomize)" | tee -a "$logfile"
+                if kubectl kustomize "$overlay" 2>&1 | tee -a "$logfile"; then
+                  echo "Local kustomize build for $overlay succeeded" | tee -a "$logfile"
+                else
+                  echo "Local kustomize build for $overlay FAILED" | tee -a "$logfile"
+                fi
+              else
+                if kubectl kustomize "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
+                  echo "Server-side dry-run for $overlay succeeded" | tee -a "$logfile"
+                else
+                  echo "Server-side dry-run for $overlay FAILED" | tee -a "$logfile"
+                fi
+              fi
+            else
+              echo "Skipping missing overlay: $overlay"
+            fi
+          done
+
+      - name: Ensure per-overlay log files
+        if: always()
+        run: |
+          set -e
+          cd $GITHUB_WORKSPACE
+          for f in overlay-base.log overlay-official.log overlay-bitnami.log crd-check.log; do
+            if [ ! -f "$f" ]; then
+              echo "No log available for $f" > "$f"
+            fi
+          done
+
+      - name: Upload overlay-base artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overlay-base
+          path: ${{ github.workspace }}/overlay-base.log
+
+      - name: Upload overlay-official artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overlay-official
+          path: ${{ github.workspace }}/overlay-official.log
+
+      - name: Upload overlay-bitnami artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overlay-bitnami
+          path: ${{ github.workspace }}/overlay-bitnami.log
+
+      - name: Upload crd-check artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crd-check
+          path: ${{ github.workspace }}/crd-check.log
+
+      - name: Upload artifacts (fallback)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overlay-logs-all
+          path: |
+            ${{ github.workspace }}/overlay-*.log
+            ${{ github.workspace }}/crd-check.log
+
+  pr-post-comment:
+    name: Post PR status comment
+    runs-on: ubuntu-latest
+    needs: pr-server-dryrun
+    if: always()
+    steps:
+      - name: Download overlay-base log
+        uses: actions/download-artifact@v4
+        with:
+          name: overlay-base
+          path: overlay-logs
+      - name: Download overlay-official log
+        uses: actions/download-artifact@v4
+        with:
+          name: overlay-official
+          path: overlay-logs
+      - name: Download overlay-bitnami log
+        uses: actions/download-artifact@v4
+        with:
+          name: overlay-bitnami
+          path: overlay-logs
+      - name: Download crd-check log
+        uses: actions/download-artifact@v4
+        with:
+          name: crd-check
+          path: overlay-logs
+      - name: Post summary comment to PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              console.log('No pull request context; skipping comment');
+              return;
+            }
+            // Determine the server dry-run job result via the Actions API (needs is not available here)
+            let result = 'unknown';
+            try {
+              const { data: jobsResp } = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: context.runId,
+              });
+              const job = (jobsResp && jobsResp.jobs) ? jobsResp.jobs.find(j => j.name === 'pr-server-dryrun') : undefined;
+              if (job && job.conclusion) result = job.conclusion;
+            } catch (e) {
+              console.log('Could not determine job result:', e.message || e);
+            }
+            const conclusion = (result === 'success') ? 'succeeded' : 'failed or had issues';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const fs = require('fs');
+            const path = require('path');
+            const logsDir = 'overlay-logs';
+            let aggregated = '';
+            try {
+              const files = fs.readdirSync(logsDir).filter(f => f.endsWith('.log'));
+              files.forEach(f => {
+                const content = fs.readFileSync(path.join(logsDir, f), 'utf8');
+                aggregated += `\n--- ${f} ---\n` + content + '\n';
+              });
+            } catch (e) {
+              aggregated = 'No logs available.';
+            }
+            const maxLen = 60000;
+            let truncated = false;
+            let log = aggregated;
+            if (log.length > maxLen) {
+              log = log.slice(0, maxLen);
+              truncated = true;
+            }
+            let body = `**Grafana overlay server-side dry-run ${conclusion}**\n\nWorkflow run: ${runUrl}\n\n`;
+            body += '```\n' + log + '\n```';
+            if (truncated) {
+              body += '\n\n*Log truncated - see full run artifacts for complete logs.*';
+            }
+
+            // Attach artifact links (if available) for quick download
+            try {
+              const { data: artResp } = await github.rest.actions.listWorkflowRunArtifacts({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: context.runId,
+              });
+              const artifacts = (artResp && artResp.artifacts) ? artResp.artifacts : [];
+              if (artifacts.length > 0) {
+                // group artifacts by expected names
+                const groups = { base: [], official: [], bitnami: [], other: [] };
+                for (const a of artifacts) {
+                  if (a.name.includes('overlay-base')) groups.base.push(a);
+                  else if (a.name.includes('overlay-official')) groups.official.push(a);
+                  else if (a.name.includes('overlay-bitnami')) groups.bitnami.push(a);
+                  else groups.other.push(a);
+                }
+                body += '\n\n**Artifacts**:\n';
+                const makeList = (arr) => arr.map(a => `- [${a.name}](${a.archive_download_url || `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`})`).join('\n');
+                if (groups.base.length) body += '\n**Base overlay**:\n' + makeList(groups.base) + '\n';
+                if (groups.official.length) body += '\n**Official overlay**:\n' + makeList(groups.official) + '\n';
+                if (groups.bitnami.length) body += '\n**Bitnami overlay**:\n' + makeList(groups.bitnami) + '\n';
+                if (groups.other.length) body += '\n**Other artifacts**:\n' + makeList(groups.other) + '\n';
+              }
+            } catch (e) {
+              console.log('Could not list artifacts:', e.message || e);
+            }
+
+            // Try to find an existing bot comment and update it, otherwise create
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            });
+            const botComment = comments.find(c => c.user && c.user.type === 'Bot' && c.body && c.body.includes('Grafana overlay server-side dry-run'));
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              });
+            }

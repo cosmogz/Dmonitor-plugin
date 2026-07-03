@@ -1,0 +1,12 @@
+{{- if .Values.provisioning.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dmonitor.fullname" . }}-grafana-provisioning
+  labels:
+    app.kubernetes.io/name: {{ include "dmonitor.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  provisioning.yml: |
+{{ .Values.provisioning.providerConfig | indent 4 }}
+{{- end }}

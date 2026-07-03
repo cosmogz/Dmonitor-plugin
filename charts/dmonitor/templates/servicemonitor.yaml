@@ -1,0 +1,21 @@
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "dmonitor.fullname" . }}-sm
+  namespace: {{ .Values.metrics.serviceMonitor.namespace }}
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "dmonitor.name" . }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: {{ .Values.metrics.port }}
+      path: {{ .Values.metrics.path }}
+      interval: 15s
+      scheme: http
+{{- end }}

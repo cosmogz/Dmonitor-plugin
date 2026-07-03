@@ -1,0 +1,24 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.26.0'
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+        run: |
+          echo "$KUBECONFIG_DATA" | base64 --decode > $HOME/.kube/config
+      - name: Apply kustomize manifests
+        run: kubectl apply -k manifests/kustomize
+      - name: Apply PrometheusRule
+        run: kubectl apply -f manifests/alerts/dmonitor-prometheusrule.yaml -n monitoring

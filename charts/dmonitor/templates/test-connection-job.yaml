@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "dmonitor.fullname" . }}-test-connection
+  labels:
+    app: {{ include "dmonitor.name" . }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: curl
+          image: curlimages/curl:8.1.0
+          command:
+            - "sh"
+            - "-c"
+            - |
+              set -e
+              TARGET=http://{{ include "dmonitor.fullname" . }}:{{ .Values.service.port }}
+              echo "Checking $TARGET/health"
+              curl -fsS $TARGET/health
+              echo "Checking $TARGET/version"
+              curl -fsS $TARGET/version
+              echo "Checking $TARGET{{ .Values.metrics.path }}"
+              curl -fsS $TARGET{{ .Values.metrics.path }} | head -n 1
+      restartPolicy: Never

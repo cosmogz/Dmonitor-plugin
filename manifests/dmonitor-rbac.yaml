@@ -1,0 +1,10 @@
+# ServiceAccount for the dmonitor pods. Adjust or expand RBAC rules as needed for your cluster.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dmonitor-sa
+  namespace: default
+
+# If you need to grant additional permissions (e.g. read-only access to Endpoints or Pods),
+# define a Role / RoleBinding here. Prometheus Operator typically runs with cluster-level
+# permissions and does not require per-app RBAC changes to scrape metrics via ServiceMonitor.

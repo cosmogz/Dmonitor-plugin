@@ -1,0 +1,61 @@
+# Example values for enabling OIDC + Grafana provisioning and using ExternalSecrets
+oidc:
+  enabled: true
+  provider: keycloak
+  issuerUrl: https://auth.example.com
+  clientID: dmonitor-grafana
+  clientSecret:
+    create: false
+    secretName: dmonitor-grafana-oidc
+    secretKey: client-secret
+  redirectURI: https://grafana.example.com/login/generic_oauth
+  scopes:
+    - openid
+    - profile
+    - email
+
+provisioning:
+  enabled: true
+  providerConfig: |-
+    apiVersion: 1
+    providers:
+      - name: 'Dmonitor'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards
+  dashboards:
+    dmonitor-dashboard.json: |
+      {
+        "annotations": {"list":[]},
+        "panels": [],
+        "schemaVersion": 30,
+        "title": "Dmonitor Overview",
+        "version": 1
+      }
+
+externalSecrets:
+  enabled: true
+  secretStoreName: my-secret-store
+  secretStoreKind: SecretStore
+  createExternalSecret: true
+  remoteKeyPrefix: dmonitor/
+  remoteKey: oidc-client-secret
+
+# Example ingress wiring for reviewers
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: grafana.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - grafana.example.com
+      secretName: grafana-tls

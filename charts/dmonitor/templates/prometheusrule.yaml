@@ -1,0 +1,19 @@
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "dmonitor.fullname" . }}-rules
+  namespace: {{ .Values.metrics.serviceMonitor.namespace }}
+spec:
+  groups:
+    - name: dmonitor.rules
+      rules:
+        - alert: OpenMRSIntegrationCircuitOpen
+          expr: openmrs_circuit_open == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OpenMRS integration circuit is open"
+            description: "The Dmonitor to OpenMRS circuit breaker is open for more than 5 minutes."
+{{- end }}
