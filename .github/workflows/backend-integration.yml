@@ -35,14 +35,11 @@ jobs:
         run: npm install
         working-directory: backend
 
-      - name: Start mock webhook server and Run integration tests
+      - name: Run integration tests
         run: |
-          # start a simple node webhook listener in background to accept POSTs
-          node -e "const http=require('http');const srv=http.createServer((req,res)=>{if(req.method==='POST'){let b='';req.on('data',c=>b+=c);req.on('end',()=>{console.log('webhook got',b);res.writeHead(200);res.end('ok');});}else{res.writeHead(200);res.end('ok');}});srv.listen(4321,()=>console.log('webhook listening on 4321'));" &
           export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/dmonitor
           export REDIS_URL=redis://127.0.0.1:6379
           export BASE_URL=http://127.0.0.1:4002
-          export NOTIFICATION_WEBHOOK_URL=http://127.0.0.1:4321/hook
           cd backend
           npm run test:integration
 
