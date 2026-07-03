@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+# Trivy ignore file for Dmonitor-plugin
+# Format: one vulnerability ID per line. Comments start with '#'.
+# Add CVE IDs here to suppress them from blocking CI until reviewed.
+# Record reviewer and rationale as a trailing comment where possible.
+# Example:
+# CVE-2023-12345 # accepted: low impact in our context; reviewer: alice; date: 2026-07-03
+
+# Place accepted CVEs below this line.
+=======
+>>>>>>> origin/main
 # Example Trivy allowlist/ignore file
 # Add CVE IDs (one per line) that you accept for now, with an optional comment.
 # Format: CVE-YYYY-NNNN  # reason

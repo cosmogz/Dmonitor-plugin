@@ -1,0 +1,43 @@
+name: Backend local test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  run-migrations-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Postgres
+        uses: harmonicsh/postgresql-action@v1
+        with:
+          postgresql-version: '15'
+          postgres-user: postgres
+          postgres-password: postgres
+          postgres-db: dmonitor
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dmonitor
+        run: |
+          cd backend
+          npm run migrate
+
+      - name: Smoke test server (start & curl)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dmonitor
+        run: |
+          cd backend
+          PORT=4001 npm start &
+          sleep 2
+          curl -fS --retry 3 http://localhost:4001/health

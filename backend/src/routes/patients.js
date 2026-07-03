@@ -1,0 +1,47 @@
+const express = require('express');
+const db = require('../db');
+
+const router = express.Router();
+
+// Lookup patient by external mapping
+router.get('/lookup', async (req, res) => {
+  const { external_system, external_id } = req.query;
+  if (!external_system || !external_id) return res.status(400).json({ error: 'external_system and external_id required' });
+  try {
+    const r = await db.query('SELECT p.* FROM patients p JOIN patient_links l ON l.patient_id = p.id WHERE l.external_system = $1 AND l.external_id = $2', [external_system, external_id]);
+    if (r.rowCount === 0) return res.json({ found: false });
+    return res.json({ found: true, patient: r.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'internal' });
+  }
+});
+
+// Pair an existing patient with external id
+router.post('/pair', async (req, res) => {
+  const { patient_id, external_system, external_id } = req.body || {};
+  if (!patient_id || !external_system || !external_id) return res.status(400).json({ error: 'patient_id, external_system and external_id required' });
+  try {
+    await db.query('INSERT INTO patient_links (patient_id, external_system, external_id) VALUES ($1,$2,$3) ON CONFLICT (external_system, external_id) DO NOTHING', [patient_id, external_system, external_id]);
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'internal' });
+  }
+});
+
+// Get patient by id
+router.get('/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: 'invalid id' });
+  try {
+    const r = await db.query('SELECT * FROM patients WHERE id = $1', [id]);
+    if (r.rowCount === 0) return res.status(404).json({ error: 'not found' });
+    res.json(r.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'internal' });
+  }
+});
+
+module.exports = router;

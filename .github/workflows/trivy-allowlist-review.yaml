@@ -1,0 +1,84 @@
+name: Trivy allowlist review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: {}
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan (high+critical)
+        uses: aquasecurity/trivy-action@v1
+        with:
+          scan-type: 'fs'
+          scan-path: '.'
+          format: 'json'
+          output: 'trivy-report.json'
+          severity: 'HIGH,CRITICAL'
+          ignorefile: '.trivyignore'
+
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
+
+      - name: Parse report and create review issue if findings
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'trivy-report.json';
+            if (!fs.existsSync(reportPath)) {
+              core.info('No Trivy report found');
+              return;
+            }
+            const data = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            const results = data.Results || [];
+            const findings = [];
+            for (const r of results) {
+              const vulns = r.Vulnerabilities || [];
+              for (const v of vulns) {
+                findings.push({
+                  vuln: v.VulnerabilityID,
+                  pkg: v.PkgName,
+                  installed: v.InstalledVersion,
+                  fixed: v.FixedVersion || 'none',
+                  severity: v.Severity,
+                  title: v.Title || ''
+                });
+              }
+            }
+
+            if (findings.length === 0) {
+              core.info('No high/critical findings (after .trivyignore).');
+              return;
+            }
+
+            const pr = context.payload.pull_request;
+            const prnum = pr ? pr.number : context.issue.number;
+            let body = `Trivy detected ${findings.length} high/critical vulnerabilities for PR #${prnum} (report uploaded as artifact).\n\n`;
+            body += 'Please review and either update `.trivyignore` with justification, or remediate the dependencies.\n\n';
+            body += '|Vulnerability|Package|Installed|Fixed|Severity|\n|---|---|---:|---|---|\n';
+            for (const f of findings) {
+              body += `|${f.vuln}|${f.pkg}|${f.installed}|${f.fixed}|${f.severity}|\n`;
+            }
+
+            // Create issue for review
+            const title = `Trivy: ${findings.length} high/critical vuln(s) in PR #${prnum}`;
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+            });
+            core.info(`Created issue ${issue.data.number}`);

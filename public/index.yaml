@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  dmonitor:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-07-03T07:10:05.751822959Z"
+    description: Dmonitor Helm chart (minimal scaffold)
+    digest: 0bef28b0574c51c07c2387793bbdbd27c5c32583cea35a6be85c2221dbde0a6d
+    name: dmonitor
+    type: application
+    urls:
+    - https://cosmogz.github.io/Dmonitor-plugin/charts/charts/dmonitor-0.1.1.tgz
+    version: 0.1.1
+generated: "2026-07-03T07:10:05.750643367Z"
