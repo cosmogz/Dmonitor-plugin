@@ -5,7 +5,17 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { patient_external_id, value, unit, recorded_at } = req.body || {};
-  if (!patient_external_id || value == null) return res.status(400).json({ error: 'patient_external_id and value required' });
+  // Basic validation
+  if (!patient_external_id) return res.status(400).json({ error: 'patient_external_id required' });
+  if (value == null || isNaN(Number(value))) return res.status(400).json({ error: 'value must be a number' });
+  const numValue = Number(value);
+  if (numValue <= 0) return res.status(400).json({ error: 'value must be > 0' });
+  const allowedUnits = ['mg/dL', 'mmol/L'];
+  const unitVal = unit || 'mg/dL';
+  if (!allowedUnits.includes(unitVal)) return res.status(400).json({ error: `unit must be one of ${allowedUnits.join(',')}` });
+  const recordedAt = recorded_at ? new Date(recorded_at) : new Date();
+  if (isNaN(recordedAt.getTime())) return res.status(400).json({ error: 'recorded_at must be a valid timestamp' });
+
   try {
     // ensure patient exists
     const p = await db.query('SELECT id FROM patients WHERE external_id = $1', [patient_external_id]);
@@ -19,10 +29,22 @@ router.post('/', async (req, res) => {
 
     const insert = await db.query(
       'INSERT INTO readings (patient_id, value, unit, recorded_at) VALUES ($1, $2, $3, $4) RETURNING id, created_at',
-      [patientId, value, unit || 'mg/dL', recorded_at || new Date()]
+      [patientId, numValue, unitVal, recordedAt]
     );
 
-    res.status(201).json({ id: insert.rows[0].id, created_at: insert.rows[0].created_at });
+    const readingId = insert.rows[0].id;
+
+    // Audit log
+    const actorId = req.user && req.user.sub ? req.user.sub : null;
+    await db.query('INSERT INTO audit_logs (actor_id, action, resource_type, resource_id, payload) VALUES ($1,$2,$3,$4,$5)', [
+      actorId,
+      'create:reading',
+      'reading',
+      readingId,
+      JSON.stringify({ patient_external_id, value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() })
+    ]);
+
+    res.status(201).json({ id: readingId, created_at: insert.rows[0].created_at });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'internal error' });
