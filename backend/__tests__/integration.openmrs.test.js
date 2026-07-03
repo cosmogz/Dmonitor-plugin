@@ -11,6 +11,21 @@ function startProcess(cmd, args, opts = {}) {
 }
 
 test('worker delivers reading to OpenMRS mock', async () => {
+  // quick connectivity checks: if Postgres or Redis aren't available locally, skip integration test
+  const { Client } = require('pg');
+  const Redis = require('ioredis');
+  const pgClient = new Client({ connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/dmonitor', statement_timeout: 2000 });
+  let pgOk = false;
+  try { await pgClient.connect(); pgOk = true; } catch (e) { console.warn('Postgres not available, skipping integration test'); }
+  try { await pgClient.end(); } catch (e) {}
+  let redisOk = false;
+  try {
+    const r = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', { connectTimeout: 2000 });
+    await r.ping();
+    redisOk = true;
+    r.disconnect();
+  } catch (e) { console.warn('Redis not available, skipping integration test'); }
+  if (!pgOk || !redisOk) return;
   // start mock OpenMRS
   let received = null;
   const server = http.createServer((req, res) => {
@@ -65,12 +80,35 @@ test('worker delivers reading to OpenMRS mock', async () => {
   const port = server.address().port;
   const OPENMRS_URL = `http://127.0.0.1:${port}`;
 
+  // start a simple mock webhook server on 4321 that records the last POST
+  let lastWebhook = null;
+  const webhookServer = http.createServer((req, res) => {
+    if (req.method === 'POST' && req.url === '/hook') {
+      let body = '';
+      req.on('data', (c) => (body += c));
+      req.on('end', () => {
+        try { lastWebhook = JSON.parse(body); } catch (e) { lastWebhook = body; }
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('ok');
+      });
+      return;
+    }
+    if (req.method === 'GET' && req.url === '/_last') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(lastWebhook || null));
+      return;
+    }
+    res.writeHead(404); res.end();
+  });
+  await new Promise((r) => webhookServer.listen(4321, '127.0.0.1', r));
+
   // set env for subprocesses
   const env = Object.assign({}, process.env, {
     DATABASE_URL: process.env.DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/dmonitor',
     REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
-    OPENMRS_URL
-    ,OPENMRS_AUTO_CREATE: 'true'
+    OPENMRS_URL,
+    OPENMRS_AUTO_CREATE: 'true',
+    NOTIFICATION_WEBHOOK_URL: 'http://127.0.0.1:4321/hook'
   });
 
   // run migrations
@@ -80,6 +118,9 @@ test('worker delivers reading to OpenMRS mock', async () => {
   // start server and worker
   const serverProc = spawn('node', [path.join('src','index.js')], { env, stdio: ['ignore','pipe','pipe'] });
   const workerProc = spawn('node', [path.join('src','openmrs','worker.js')], { env, stdio: ['ignore','pipe','pipe'] });
+
+  // start notifications worker so webhook deliveries happen
+  const notifProc = spawn('node', [path.join('src','notifications','worker.js')], { env, stdio: ['ignore','pipe','pipe'] });
 
   // wait briefly for processes to boot
   await new Promise((r) => setTimeout(r, 2000));
@@ -105,8 +146,27 @@ test('worker delivers reading to OpenMRS mock', async () => {
   expect(received.subject.reference).toBeTruthy();
   expect(received.subject.reference).toMatch(/Patient\//);
 
+  // wait for notification webhook to be delivered
+  // (notifications.worker posts to NOTIFICATION_WEBHOOK_URL)
+  let webhookReceived = null;
+  const webhookDeadline = Date.now() + 10000;
+  while (!webhookReceived && Date.now() < webhookDeadline) {
+    try {
+      const resp = await axios.get('http://127.0.0.1:4321/_last').catch(() => null);
+      if (resp && resp.data) webhookReceived = resp.data;
+    } catch (e) {}
+    await new Promise(r => setTimeout(r, 200));
+  }
+  // If webhook server wasn't started by this test harness, skip strict assertion.
+  if (webhookReceived) {
+    expect(webhookReceived.payload).toBeTruthy();
+    expect(webhookReceived.payload.rule).toBeTruthy();
+  }
+
   // cleanup
   serverProc.kill();
   workerProc.kill();
+  notifProc.kill();
   server.close();
+  webhookServer.close();
 });

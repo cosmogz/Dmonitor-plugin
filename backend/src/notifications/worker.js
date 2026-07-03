@@ -1,6 +1,7 @@
 const Redis = require('ioredis');
 const db = require('../db');
 const axios = require('axios');
+const nodemailer = require('nodemailer');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const redis = new Redis(REDIS_URL);
@@ -33,6 +34,22 @@ async function deliverWebhook(notification, p) {
   return res.status >= 200 && res.status < 300;
 }
 
+async function deliverEmail(notification, p) {
+  const SMTP_URL = process.env.SMTP_URL || process.env.SMTP_URI || '';
+  const DEFAULT_TO = process.env.NOTIFICATION_DEFAULT_EMAIL || '';
+  if (!SMTP_URL) throw new Error('no SMTP configured');
+
+  const transporter = nodemailer.createTransport(SMTP_URL);
+  const to = (notification && notification.to) || DEFAULT_TO;
+  if (!to) throw new Error('no recipient email configured');
+
+  const subject = `Alert: ${p && p.rule ? p.rule.type : 'notification'}`;
+  const text = p && p.rule ? `${p.rule.message}` : JSON.stringify(p || {});
+
+  const info = await transporter.sendMail({ from: process.env.NOTIFICATION_FROM || 'noreply@example.com', to, subject, text });
+  return !!info;
+}
+
 async function processOnce() {
   // move any due retries into the queue first
   await moveReadyRetriesToQueue();
@@ -47,6 +64,8 @@ async function processOnce() {
   try {
     if (channel === 'webhook') {
       await deliverWebhook(job, p);
+    } else if (channel === 'email') {
+      await deliverEmail(job, p);
     } else if (WEBHOOK_URL) {
       // fallback: if a default webhook is configured, deliver there
       await deliverWebhook(job, p);
@@ -85,4 +104,4 @@ if (require.main === module) {
 }
 
 // exported for tests
-module.exports = { deliverWebhook, backoffSeconds, moveReadyRetriesToQueue };
+module.exports = { deliverWebhook, deliverEmail, backoffSeconds, moveReadyRetriesToQueue };
