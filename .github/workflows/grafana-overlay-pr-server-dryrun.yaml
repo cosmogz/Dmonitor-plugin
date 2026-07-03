@@ -62,24 +62,29 @@ jobs:
           LOGFILE="$GITHUB_WORKSPACE/crd-check.log"
           rm -f "$LOGFILE" || true
           touch "$LOGFILE"
-          echo "Starting CRD sanity check" | tee -a "$LOGFILE"
-          CRDS=(
-            servicemonitors.monitoring.coreos.com
-            prometheusrules.monitoring.coreos.com
-            podmonitors.monitoring.coreos.com
-            externalsecrets.external-secrets.io
-          )
-          MISSING=()
-          for crd in "${CRDS[@]}"; do
-            if ! kubectl get crd "$crd" >/dev/null 2>&1; then
-              MISSING+=("$crd")
-            fi
-          done
-          if [ ${#MISSING[@]} -ne 0 ]; then
-            echo "Missing required CRDs: ${MISSING[*]}" | tee -a "$LOGFILE"
-            echo "Install the corresponding operators (Prometheus Operator, ExternalSecrets) in the staging cluster before running this check." | tee -a "$LOGFILE"
+          # Skip the CRD sanity check when running local builds (no cloud configured)
+          if [ "${CLOUD:-none}" = "none" ]; then
+            echo "CLOUD=none detected; skipping CRD sanity check." | tee -a "$LOGFILE"
           else
-            echo "All required CRDs present." | tee -a "$LOGFILE"
+            echo "Starting CRD sanity check" | tee -a "$LOGFILE"
+            CRDS=(
+              servicemonitors.monitoring.coreos.com
+              prometheusrules.monitoring.coreos.com
+              podmonitors.monitoring.coreos.com
+              externalsecrets.external-secrets.io
+            )
+            MISSING=()
+            for crd in "${CRDS[@]}"; do
+              if ! kubectl get crd "$crd" >/dev/null 2>&1; then
+                MISSING+=("$crd")
+              fi
+            done
+            if [ ${#MISSING[@]} -ne 0 ]; then
+              echo "Missing required CRDs: ${MISSING[*]}" | tee -a "$LOGFILE"
+              echo "Install the corresponding operators (Prometheus Operator, ExternalSecrets) in the staging cluster before running this check." | tee -a "$LOGFILE"
+            else
+              echo "All required CRDs present." | tee -a "$LOGFILE"
+            fi
           fi
       - name: Upload CRD check log (always)
         if: always()
