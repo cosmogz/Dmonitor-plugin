@@ -1,0 +1,7 @@
+# Example Trivy allowlist/ignore file
+# Add CVE IDs (one per line) that you accept for now, with an optional comment.
+# Format: CVE-YYYY-NNNN  # reason
+# Example:
+# CVE-2023-12345  # low risk in our base image due to patched runtime
+
+# No entries yet — add CVE IDs to allowlist as needed.

@@ -1,0 +1,34 @@
+name: Publish Helm chart to gh-pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  publish-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Package chart
+        run: |
+          mkdir -p public/charts
+          helm package charts/dmonitor --destination public/charts
+
+      - name: Create Helm repo index
+        run: |
+          helm repo index public --url https://
+          echo "Set repository URL in the step below before publishing if needed"
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+*** End Patch
