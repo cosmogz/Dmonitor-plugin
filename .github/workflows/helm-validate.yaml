@@ -1,0 +1,33 @@
+name: "Helm chart validate"
+
+on:
+  pull_request:
+    paths:
+      - 'charts/dmonitor/**'
+
+jobs:
+  validate:
+    name: Lint and render Helm chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        run: |
+          set -e
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Helm lint
+        run: helm lint charts/dmonitor
+
+      - name: Helm template
+        run: |
+          set -e
+          helm template my-dmonitor charts/dmonitor -f charts/dmonitor/examples/values-oidc-provisioning.yaml > dmonitor-rendered.yaml
+
+      - name: Upload rendered manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmonitor-rendered
+          path: dmonitor-rendered.yaml
