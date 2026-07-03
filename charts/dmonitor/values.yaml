@@ -16,6 +16,30 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# OIDC / OAuth configuration (for Grafana or app auth)
+# Enable and configure OIDC provider details below. Secrets are expected
+# to be provided via existing Kubernetes Secrets or set `clientSecret.create`.
+oidc:
+  enabled: false
+  provider: "generic"
+  issuerUrl: ""
+  clientID: ""
+  # Do not put secrets here in plaintext. Prefer creating a K8s secret and
+  # referencing it below. Set clientSecret.create=true to create a secret
+  # from the provided value (not recommended for production).
+  clientSecret:
+    create: false
+    # value: "" # Optional: secret value to create (not recommended)
+    secretName: ""
+    secretKey: "client-secret"
+  redirectURI: ""
+  scopes:
+    - openid
+    - profile
+    - email
+  tlsSkipVerify: false
+
 replicaCount: 2
 image:
   repository: cosmogz/dmonitor

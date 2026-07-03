@@ -1,0 +1,23 @@
+{{- if .Values.oidc.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dmonitor.fullname" . }}-grafana-ini
+  labels:
+    app.kubernetes.io/name: {{ include "dmonitor.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  grafana.ini: |
+    [auth.generic_oauth]
+    enabled = true
+    name = {{ default "OIDC" .Values.oidc.provider }}
+    allow_sign_up = true
+    client_id = {{ .Values.oidc.clientID }}
+    client_secret = {{ if .Values.oidc.clientSecret.secretName }}__FROM_SECRET__{{ else }}{{ default "" .Values.oidc.clientSecret.value }}{{ end }}
+    auth_url = {{ .Values.oidc.issuerUrl }}
+    token_url = {{ .Values.oidc.issuerUrl }}
+    api_url = {{ .Values.oidc.issuerUrl }}
+    ; set scopes
+    scopes = {{ join "," .Values.oidc.scopes }}
+    tls_skip_verify_insecure = {{ if .Values.oidc.tlsSkipVerify }}true{{ else }}false{{ end }}
+{{- end }}
