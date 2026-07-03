@@ -42,6 +42,34 @@ If you use the ExternalSecrets operator, the chart can create an `ExternalSecret
 
 Important: Creating ExternalSecrets from the chart is convenient for demos but in production you may want to manage them separately with proper RBAC and secret store configurations.
 
+Example ExternalSecret
+----------------------
+
+An example `ExternalSecret` is included at `charts/dmonitor/examples/external-secret-example.yaml` showing how to map a remote key into a Kubernetes Secret used by the chart's OIDC config. Ensure you create the appropriate `SecretStore` / `ClusterSecretStore` and grant the operator the necessary RBAC.
+
+```yaml
+# charts/dmonitor/examples/external-secret-example.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+	name: dmonitor-grafana-oidc
+spec:
+	secretStoreRef:
+		name: my-secret-store
+		kind: SecretStore
+	target:
+		name: dmonitor-grafana-oidc
+	data:
+		- secretKey: client-secret
+			remoteRef:
+				key: dmonitor/oidc-client-secret
+```
+
+Notes:
+- Replace `secretStoreRef.name` with your configured store name.
+- Use `ClusterSecretStore` for cluster-scoped stores (GCP/AWS/Vault).
+- Follow the ExternalSecrets operator docs for provider-specific auth and RBAC setup.
+
 SecretStore provider examples
 ----------------------------
 
