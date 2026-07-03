@@ -82,6 +82,8 @@ jobs:
             if [ ${#MISSING[@]} -ne 0 ]; then
               echo "Missing required CRDs: ${MISSING[*]}" | tee -a "$LOGFILE"
               echo "Install the corresponding operators (Prometheus Operator, ExternalSecrets) in the staging cluster before running this check." | tee -a "$LOGFILE"
+              echo "CRD sanity check failed — exiting with non-zero status." | tee -a "$LOGFILE"
+              exit 1
             else
               echo "All required CRDs present." | tee -a "$LOGFILE"
             fi
@@ -102,6 +104,7 @@ jobs:
             manifests/grafana/overlay/examples/official
             manifests/grafana/overlay/examples/bitnami
           )
+          FAILED=0
           for overlay in "${OVERLAYS[@]}"; do
             if [ -d "$overlay" ]; then
               case "$overlay" in
@@ -124,18 +127,24 @@ jobs:
                   echo "Local kustomize build for $overlay succeeded" | tee -a "$logfile"
                 else
                   echo "Local kustomize build for $overlay FAILED" | tee -a "$logfile"
+                  FAILED=1
                 fi
               else
                 if kubectl kustomize "$overlay" | kubectl apply --server-dry-run=server -f - 2>&1 | tee -a "$logfile"; then
                   echo "Server-side dry-run for $overlay succeeded" | tee -a "$logfile"
                 else
                   echo "Server-side dry-run for $overlay FAILED" | tee -a "$logfile"
+                  FAILED=1
                 fi
               fi
             else
               echo "Skipping missing overlay: $overlay"
             fi
           done
+          if [ "$FAILED" -ne 0 ]; then
+            echo "One or more overlays failed the dry-run; exiting with non-zero status." | tee -a "$GITHUB_WORKSPACE/crd-check.log"
+            exit 1
+          fi
 
       - name: Ensure per-overlay log files
         if: always()
