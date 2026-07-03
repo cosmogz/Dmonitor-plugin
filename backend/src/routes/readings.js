@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../db');
 
 const router = express.Router();
+const openmrs = require('../openmrs/adapter');
 
 router.post('/', async (req, res) => {
   const { patient_external_id, value, unit, recorded_at } = req.body || {};
@@ -43,6 +44,15 @@ router.post('/', async (req, res) => {
       readingId,
       JSON.stringify({ patient_external_id, value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() })
     ]);
+
+    // Fire-and-forget: try to send to OpenMRS if configured
+    (async () => {
+      try {
+        await openmrs.sendObservation(patient_external_id, { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() });
+      } catch (err) {
+        console.error('OpenMRS send failed (non-fatal):', err.message || err);
+      }
+    })();
 
     res.status(201).json({ id: readingId, created_at: insert.rows[0].created_at });
   } catch (err) {
