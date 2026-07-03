@@ -26,7 +26,27 @@ async function evaluateAndCreateAlert(patientId, readingId, reading) {
   const q = `INSERT INTO alerts (patient_id, reading_id, severity, type, message, metadata) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`;
   const params = [patientId, readingId, rule.severity, rule.type, rule.message, JSON.stringify(metadata)];
   const res = await db.query(q, params);
-  return res.rows && res.rows[0] ? res.rows[0].id : null;
+    const alertId = res.rows && res.rows[0] ? res.rows[0].id : null;
+
+    // create a notification record and enqueue for delivery (default channel: webhook)
+    if (alertId) {
+      try {
+        const notifQ = `INSERT INTO notifications (alert_id, channel, payload) VALUES ($1,$2,$3) RETURNING id`;
+        const notifParams = [alertId, process.env.DEFAULT_NOTIFICATION_CHANNEL || 'webhook', JSON.stringify({ alertId, patientId, rule })];
+        const nr = await db.query(notifQ, notifParams);
+        const notifId = nr.rows && nr.rows[0] ? nr.rows[0].id : null;
+        if (notifId && process.env.REDIS_URL) {
+          const Redis = require('ioredis');
+          const r = new Redis(process.env.REDIS_URL);
+          await r.rpush('notifications:queue', JSON.stringify({ notification_id: notifId, channel: process.env.DEFAULT_NOTIFICATION_CHANNEL || 'webhook', payload: { alertId, rule } }));
+          r.disconnect();
+        }
+      } catch (e) {
+        console.error('failed to create/enqueue notification', e.message || e);
+      }
+    }
+
+    return alertId;
 }
 
 module.exports = { evaluateAndCreateAlert, classifyGlucose };

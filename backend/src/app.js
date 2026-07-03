@@ -21,6 +21,10 @@ app.use('/api/v1/readings', readings);
 const alerts = require('./routes/alerts');
 app.use('/api/v1/alerts', alerts);
 
+// Notifications endpoint
+const notifications = require('./routes/notifications');
+app.use('/api/v1/notifications', notifications);
+
 // Auth routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
