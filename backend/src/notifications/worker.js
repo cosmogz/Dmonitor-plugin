@@ -4,7 +4,12 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const redis = new Redis(REDIS_URL);
+let _redis = null;
+function getRedis() {
+  if (_redis) return _redis;
+  _redis = new Redis(REDIS_URL);
+  return _redis;
+}
 const QUEUE = 'notifications:queue';
 const RETRY_SET = 'notifications:retry';
 const MAX_ATTEMPTS = parseInt(process.env.NOTIFICATION_MAX_ATTEMPTS || '5', 10);
@@ -17,6 +22,7 @@ function backoffSeconds(attempts) {
 
 async function moveReadyRetriesToQueue() {
   const now = Date.now();
+  const redis = getRedis();
   const items = await redis.zrangebyscore(RETRY_SET, 0, now, 'LIMIT', 0, 50);
   if (!items || items.length === 0) return;
   const pipeline = redis.pipeline();
@@ -76,6 +82,7 @@ async function processOnce() {
   // move any due retries into the queue first
   await moveReadyRetriesToQueue();
 
+  const redis = getRedis();
   const item = await redis.blpop(QUEUE, 5);
   if (!item) return;
   const payload = item[1];
@@ -109,6 +116,7 @@ async function processOnce() {
     } else {
       const delay = backoffSeconds(attempts) * 1000;
       const runAt = Date.now() + delay;
+      const redis = getRedis();
       await redis.zadd(RETRY_SET, runAt, payload);
       console.log('requeued notification', notification_id, 'for retry in', delay, 'ms');
     }
@@ -117,6 +125,8 @@ async function processOnce() {
 
 async function main() {
   console.log('Notification worker starting, connecting to', REDIS_URL);
+  // ensure redis client instantiated when worker starts
+  getRedis();
   console.log('Webhook URL configured:', !!WEBHOOK_URL);
   while (true) await processOnce();
 }
@@ -125,5 +135,12 @@ if (require.main === module) {
   main().catch(err => { console.error('worker fatal', err); process.exit(1); });
 }
 
+async function shutdownRedis() {
+  if (_redis) {
+    try { await _redis.quit(); } catch (e) { try { _redis.disconnect(); } catch (_) {} }
+    _redis = null;
+  }
+}
+
 // exported for tests
-module.exports = { deliverWebhook, deliverEmail, backoffSeconds, moveReadyRetriesToQueue };
+module.exports = { deliverWebhook, deliverEmail, backoffSeconds, moveReadyRetriesToQueue, shutdownRedis };
