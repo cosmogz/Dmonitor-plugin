@@ -14,16 +14,26 @@ test('worker delivers reading to OpenMRS mock', async () => {
   // start mock OpenMRS
   let received = null;
   const server = http.createServer((req, res) => {
-    if (req.method === 'POST' && req.url.includes('/api/observations')) {
+    if (req.method === 'GET' && req.url.startsWith('/ws/rest/v1/patient')) {
+      // simulate search endpoint returning results array
+      const q = req.url.split('?q=')[1] || '';
+      const id = decodeURIComponent(q) || 'ext-123';
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ results: [{ uuid: 'patient-uuid-1', display: id }] }));
+      return;
+    }
+
+    if (req.method === 'POST' && req.url.includes('/Observation')) {
       let body = '';
       req.on('data', (c) => (body += c));
       req.on('end', () => {
         received = JSON.parse(body);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true }));
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ id: 'obs-1' }));
       });
       return;
     }
+
     res.writeHead(404); res.end();
   });
 
