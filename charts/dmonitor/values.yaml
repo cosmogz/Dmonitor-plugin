@@ -50,6 +50,22 @@ provisioning:
   # dashboards: map of filename -> JSON/YAML content
   dashboards: {}
 
+# ExternalSecrets integration (ExternalSecrets operator required)
+externalSecrets:
+  enabled: false
+  # Name of the SecretStore or ClusterSecretStore to reference
+  secretStoreName: "my-secret-store"
+  # Kind: "SecretStore" or "ClusterSecretStore"
+  secretStoreKind: "SecretStore"
+  # When true the chart will create an ExternalSecret resource to populate
+  # the Kubernetes Secret named in `oidc.clientSecret.secretName` from the
+  # external secret store. Prefer creating ExternalSecrets separately in
+  # production and leave this disabled.
+  createExternalSecret: false
+  # remoteKey to fetch from the external store; chart will use this when creating ExternalSecret
+  remoteKeyPrefix: "dmonitor/"
+
+
 replicaCount: 2
 image:
   repository: cosmogz/dmonitor
