@@ -15,11 +15,35 @@ test('worker delivers reading to OpenMRS mock', async () => {
   let received = null;
   const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url.startsWith('/ws/rest/v1/patient')) {
-      // simulate search endpoint returning results array
-      const q = req.url.split('?q=')[1] || '';
+      // simulate search endpoint returning results array unless searching for ext-create
+      const q = (req.url.split('?q=')[1] || '');
       const id = decodeURIComponent(q) || 'ext-123';
+      if (id === 'ext-create') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ results: [] }));
+        return;
+      }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ results: [{ uuid: 'patient-uuid-1', display: id }] }));
+      return;
+    }
+
+    if (req.method === 'GET' && req.url.startsWith('/ws/rest/v1/identifiertype')) {
+      // return a fake identifier type if queried
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ results: [{ uuid: 'idtype-1', display: 'UNKNOWN' }] }));
+      return;
+    }
+
+    if (req.method === 'POST' && req.url.startsWith('/ws/rest/v1/patient')) {
+      // simulate patient create
+      let body = '';
+      req.on('data', (c) => (body += c));
+      req.on('end', () => {
+        receivedCreate = JSON.parse(body);
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ uuid: 'patient-uuid-created' }));
+      });
       return;
     }
 
@@ -46,6 +70,7 @@ test('worker delivers reading to OpenMRS mock', async () => {
     DATABASE_URL: process.env.DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5432/dmonitor',
     REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
     OPENMRS_URL
+    ,OPENMRS_AUTO_CREATE: 'true'
   });
 
   // run migrations
@@ -66,7 +91,8 @@ test('worker delivers reading to OpenMRS mock', async () => {
   expect(token).toBeTruthy();
 
   // post a reading
-  const reading = { patient_external_id: 'ext-123', value: 5.4, unit: 'mg/dL' };
+  // test auto-create path for ext-create (server returns empty search, then create)
+  const reading = { patient_external_id: 'ext-create', value: 5.4, unit: 'mg/dL', type: 'glucose' };
   await axios.post(`${base}/api/v1/readings`, reading, { headers: { Authorization: `Bearer ${token}` } });
 
   // wait for worker to deliver
@@ -75,8 +101,9 @@ test('worker delivers reading to OpenMRS mock', async () => {
   expect(received).toBeTruthy();
   expect(received.resourceType).toBe('Observation');
   expect(received.subject).toBeTruthy();
-  expect(received.subject.identifier).toBeTruthy();
-  expect(received.subject.identifier.value).toBe(reading.patient_external_id);
+  // when auto-created, adapter should set subject.reference to created UUID
+  expect(received.subject.reference).toBeTruthy();
+  expect(received.subject.reference).toMatch(/Patient\//);
 
   // cleanup
   serverProc.kill();

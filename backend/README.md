@@ -32,6 +32,14 @@ npm run test:integration
 ```
 
 If you want CI to run integration tests on PRs, see `.github/workflows/backend-integration.yml`.
+
+OpenMRS-specific env vars
+- `OPENMRS_URL`: base URL for OpenMRS (required to enable adapter)
+- `OPENMRS_AUTO_CREATE`: set to `true` to attempt creating missing patients
+- `OPENMRS_DEFAULT_IDENTIFIER_TYPE`: name or UUID of the identifier type to use when creating patients. If a name is provided, the adapter will attempt to look up the corresponding UUID via the OpenMRS `identifiertype` endpoint.
+
+Observation mapping
+- Postings to `/api/v1/readings` can include `type` (e.g. `glucose`, `hba1c`, `blood_pressure`) and the adapter will map to default LOINC codes and normalize units where possible.
 # Dmonitor backend
 
 Minimal Node/Express backend scaffold for Dmonitor.
