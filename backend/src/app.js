@@ -1,12 +1,33 @@
 require('dotenv').config();
 const express = require('express');
 const pino = require('pino')();
+const pinoHttp = require('pino-http');
+const helmet = require('helmet');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const auth = require('./middleware/auth');
+const requestId = require('./middleware/requestId');
+const errorHandler = require('./middleware/errorHandler');
 const db = require('./db');
 
 const app = express();
+
+// Security headers
+app.use(helmet());
+
+// CORS — origins configurable via CORS_ORIGIN env var (comma-separated)
+const allowedOrigins = (process.env.CORS_ORIGIN || '*').split(',').map(s => s.trim());
+app.use(cors({
+  origin: allowedOrigins.includes('*') ? '*' : (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+}));
+
 app.use(express.json());
+app.use(requestId);
+app.use(pinoHttp({ logger: pino, genReqId: (req) => req.id }));
 
 // Global rate limit: 200 req/min per IP
 app.use(rateLimit({ windowMs: 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));
@@ -45,5 +66,8 @@ app.use('/api/v1/notifications', notifications);
 // Auth routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
+
+// Centralized error handler (must be last)
+app.use(errorHandler);
 
 module.exports = app;

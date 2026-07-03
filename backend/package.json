@@ -11,19 +11,24 @@
     "lint": "echo 'no lint configured'",
     "worker:openmrs": "node src/openmrs/worker.js",
     "test": "jest",
-    "test:integration": "jest __tests__/integration.openmrs.test.js --runInBand"
+    "test:integration": "jest __tests__/integration.openmrs.test.js --runInBand",
+    "worker:notifications": "node src/notifications/worker.js",
+    "workers": "node src/openmrs/worker.js & node src/notifications/worker.js"
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "express-rate-limit": "^8.5.2",
+    "helmet": "^7.1.0",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^6.9.4",
-    "express-rate-limit": "^7.0.0",
     "pg": "^8.10.0",
-    "pino": "^8.18.0"
+    "pino": "^8.18.0",
+    "pino-http": "^9.0.0"
   },
   "devDependencies": {
     "jest": "^29.6.4",
