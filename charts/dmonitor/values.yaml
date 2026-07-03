@@ -69,11 +69,41 @@ oidc:
 
 # Grafana provisioning (provisioning by configmaps)
 provisioning:
-  enabled: false
+  enabled: true
   providerConfig: |-
     apiVersion: 1
-    providers: []
-  dashboards: {}
+    providers:
+      - name: 'Dmonitor'
+        orgId: 1
+        folder: 'Dmonitor'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards
+  dashboards:
+    dmonitor-operational.json: |
+      {
+        "uid": "dmonitor-operational",
+        "title": "Dmonitor Operational",
+        "schemaVersion": 38,
+        "version": 1,
+        "refresh": "30s",
+        "time": { "from": "now-1h", "to": "now" },
+        "timezone": "browser",
+        "tags": ["dmonitor", "operational"],
+        "panels": [
+          { "id": 1, "type": "stat", "title": "Alerts Created (total)", "gridPos": {"x":0,"y":0,"w":6,"h":4}, "targets": [{"expr":"sum(dmonitor_alerts_created_total)","legendFormat":"total"}] },
+          { "id": 2, "type": "stat", "title": "Notifications Sent (total)", "gridPos": {"x":6,"y":0,"w":6,"h":4}, "targets": [{"expr":"dmonitor_notifications_sent_total","legendFormat":"sent"}] },
+          { "id": 3, "type": "stat", "title": "Notifications Failed (total)", "gridPos": {"x":12,"y":0,"w":6,"h":4}, "targets": [{"expr":"dmonitor_notifications_failed_total","legendFormat":"failed"}] },
+          { "id": 4, "type": "stat", "title": "Notifications Dead (total)", "gridPos": {"x":18,"y":0,"w":6,"h":4}, "targets": [{"expr":"dmonitor_notifications_dead_total","legendFormat":"dead"}] },
+          { "id": 5, "type": "timeseries", "title": "Alert Rate by Severity (per 5m)", "gridPos": {"x":0,"y":4,"w":12,"h":8}, "targets": [{"expr":"sum by(severity) (increase(dmonitor_alerts_created_total[5m]))","legendFormat":"{{severity}}"}] },
+          { "id": 6, "type": "timeseries", "title": "Notification Delivery Rate (per 5m)", "gridPos": {"x":12,"y":4,"w":12,"h":8}, "targets": [{"expr":"increase(dmonitor_notifications_sent_total[5m])","legendFormat":"sent"},{"expr":"increase(dmonitor_notifications_failed_total[5m])","legendFormat":"failed"},{"expr":"increase(dmonitor_notifications_dead_total[5m])","legendFormat":"dead"}] },
+          { "id": 7, "type": "gauge", "title": "Delivery Success Rate (%)", "gridPos": {"x":0,"y":12,"w":8,"h":4}, "targets": [{"expr":"100 * dmonitor_notifications_sent_total / clamp_min(dmonitor_notifications_processed_total, 1)","legendFormat":"success %"}], "fieldConfig": {"defaults":{"unit":"percent","min":0,"max":100}} },
+          { "id": 8, "type": "timeseries", "title": "Node.js Heap (bytes)", "gridPos": {"x":0,"y":16,"w":12,"h":8}, "targets": [{"expr":"nodejs_heap_size_used_bytes","legendFormat":"used"},{"expr":"nodejs_heap_size_total_bytes","legendFormat":"total"}], "fieldConfig": {"defaults":{"unit":"bytes"}} },
+          { "id": 9, "type": "timeseries", "title": "Event Loop Lag p99 (s)", "gridPos": {"x":12,"y":16,"w":12,"h":8}, "targets": [{"expr":"nodejs_eventloop_lag_p50_seconds","legendFormat":"p50"},{"expr":"nodejs_eventloop_lag_p99_seconds","legendFormat":"p99"}], "fieldConfig": {"defaults":{"unit":"s"}} }
+        ]
+      }
 
 # ExternalSecrets integration (ExternalSecrets operator required)
 externalSecrets:

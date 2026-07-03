@@ -1,0 +1,174 @@
+{
+  "uid": "dmonitor-operational",
+  "title": "Dmonitor Operational",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "tags": ["dmonitor", "operational"],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Alerts Created (total)",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "sum(dmonitor_alerts_created_total)", "legendFormat": "total" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Notifications Sent (total)",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "dmonitor_notifications_sent_total", "legendFormat": "sent" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Notifications Failed (total)",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "dmonitor_notifications_failed_total", "legendFormat": "failed" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 10 }] } } }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Notifications Dead (total)",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "dmonitor_notifications_dead_total", "legendFormat": "dead" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 5 }] } } }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Alert Creation Rate (per 5m)",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum by(severity) (increase(dmonitor_alerts_created_total[5m]))", "legendFormat": "{{severity}}" },
+        { "expr": "sum by(type) (increase(dmonitor_alerts_created_total[5m]))", "legendFormat": "{{type}}" }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "lineWidth": 2 } } }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Notification Delivery Rate (per 5m)",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "increase(dmonitor_notifications_sent_total[5m])", "legendFormat": "sent" },
+        { "expr": "increase(dmonitor_notifications_failed_total[5m])", "legendFormat": "failed" },
+        { "expr": "increase(dmonitor_notifications_retried_total[5m])", "legendFormat": "retried" },
+        { "expr": "increase(dmonitor_notifications_dead_total[5m])", "legendFormat": "dead" }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "lineWidth": 2 } }, "overrides": [
+        { "matcher": { "id": "byName", "options": "failed" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+        { "matcher": { "id": "byName", "options": "dead" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+        { "matcher": { "id": "byName", "options": "sent" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+      ] }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Notifications Retried (total)",
+      "gridPos": { "x": 0, "y": 12, "w": 8, "h": 4 },
+      "targets": [
+        { "expr": "dmonitor_notifications_retried_total", "legendFormat": "retried" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }] } } }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Notifications Processed (total attempts)",
+      "gridPos": { "x": 8, "y": 12, "w": 8, "h": 4 },
+      "targets": [
+        { "expr": "dmonitor_notifications_processed_total", "legendFormat": "processed" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area" },
+      "fieldConfig": { "defaults": {} }
+    },
+    {
+      "id": 9,
+      "type": "gauge",
+      "title": "Delivery Success Rate (%)",
+      "gridPos": { "x": 16, "y": 12, "w": 8, "h": 4 },
+      "targets": [
+        {
+          "expr": "100 * dmonitor_notifications_sent_total / clamp_min(dmonitor_notifications_processed_total, 1)",
+          "legendFormat": "success %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 80 }, { "color": "green", "value": 95 }] }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Node.js Heap Used (bytes)",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "nodejs_heap_size_used_bytes", "legendFormat": "heap used" },
+        { "expr": "nodejs_heap_size_total_bytes", "legendFormat": "heap total" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "lineWidth": 1 } } }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Node.js Event Loop Lag (p50/p99, seconds)",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "nodejs_eventloop_lag_p50_seconds", "legendFormat": "p50" },
+        { "expr": "nodejs_eventloop_lag_p99_seconds", "legendFormat": "p99" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 1 } }, "overrides": [
+        { "matcher": { "id": "byName", "options": "p99" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+      ] }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Process CPU Usage (rate, 1m)",
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "rate(process_cpu_user_seconds_total[1m])", "legendFormat": "user" },
+        { "expr": "rate(process_cpu_system_seconds_total[1m])", "legendFormat": "system" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 1 } } }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Active Handles & Requests",
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "nodejs_active_handles_total", "legendFormat": "handles" },
+        { "expr": "nodejs_active_requests_total", "legendFormat": "requests" }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "lineWidth": 1 } } }
+    }
+  ]
+}

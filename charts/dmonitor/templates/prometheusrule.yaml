@@ -16,4 +16,51 @@ spec:
           annotations:
             summary: "OpenMRS integration circuit is open"
             description: "The Dmonitor to OpenMRS circuit breaker is open for more than 5 minutes."
+
+        - alert: DeadNotificationsAccumulating
+          expr: increase(dmonitor_notifications_dead_total[15m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Dead-letter notifications accumulating"
+            description: "{{ "{{ $value }}" }} notification(s) have been moved to dead-letter in the last 15 minutes."
+
+        - alert: NotificationFailureRateHigh
+          expr: |
+            rate(dmonitor_notifications_failed_total[5m])
+            / clamp_min(rate(dmonitor_notifications_processed_total[5m]), 0.001) > 0.5
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Notification failure rate above 50%"
+            description: "More than half of notification delivery attempts are failing over the last 5 minutes."
+
+        - alert: AlertBurstCritical
+          expr: increase(dmonitor_alerts_created_total{severity="critical"}[5m]) > 10
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High burst of critical patient alerts"
+            description: "{{ "{{ $value }}" }} critical alerts were created in the last 5 minutes."
+
+        - alert: NodeHeapUsageHigh
+          expr: nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node.js heap usage above 90%"
+            description: "The backend process heap is {{ "{{ $value | humanizePercentage }}" }} full."
+
+        - alert: EventLoopLagHigh
+          expr: nodejs_eventloop_lag_p99_seconds > 0.5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node.js event loop p99 lag > 500ms"
+            description: "Event loop p99 lag is {{ "{{ $value }}" }}s — the backend may be overloaded."
 {{- end }}

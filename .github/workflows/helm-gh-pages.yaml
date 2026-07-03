@@ -23,16 +23,10 @@ jobs:
 
       - name: Create Helm repo index
         run: |
-<<<<<<< HEAD
-          # Set the public URL for the GitHub Pages site for this repo
           REPO_OWNER="cosmogz"
           REPO_NAME="Dmonitor-plugin"
           CHARTS_URL="https://${REPO_OWNER}.github.io/${REPO_NAME}/charts"
           helm repo index public --url "${CHARTS_URL}"
-=======
-          helm repo index public --url https://
-          echo "Set repository URL in the step below before publishing if needed"
->>>>>>> origin/main
 
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v5
