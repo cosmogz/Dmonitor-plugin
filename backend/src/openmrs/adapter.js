@@ -123,7 +123,7 @@ async function sendObservation(patientExternalId, reading) {
   let patientUuid = null;
   try {
     if (process.env.OPENMRS_AUTO_CREATE === 'true') {
-      patientUuid = await findOrCreatePatientUuid(patientExternalId);
+      patientUuid = await findOrCreatePatientUuid(patientExternalId, reading.patient_info || {});
     } else {
       patientUuid = await findPatientUuid(patientExternalId);
     }
@@ -192,7 +192,7 @@ async function findIdentifierTypeUuid(name) {
   }
 }
 
-async function findOrCreatePatientUuid(patientExternalId) {
+async function findOrCreatePatientUuid(patientExternalId, opts = {}) {
   const found = await findPatientUuid(patientExternalId).catch(() => null);
   if (found) return found;
   if (process.env.OPENMRS_CREATE_PATIENT_URL === 'false') throw new Error('patient create disabled');
@@ -214,15 +214,8 @@ async function findOrCreatePatientUuid(patientExternalId) {
     else identifierType = await findIdentifierTypeUuid(maybeUuid).catch(() => null);
   }
 
-  const payload = {
-    person: {
-      names: [{ givenName: 'Unknown', familyName: `Patient-${patientExternalId}` }],
-      gender: 'unknown'
-    },
-    identifiers: [
-      { identifier: patientExternalId, identifierType: identifierType || (process.env.OPENMRS_DEFAULT_IDENTIFIER_TYPE || 'UNKNOWN'), location: process.env.OPENMRS_DEFAULT_LOCATION || undefined }
-    ]
-  };
+  // build a more robust payload using available opts (name, gender, birthdate, address)
+  const payload = buildPatientPayload(patientExternalId, Object.assign({}, opts, { identifierType }));
 
   const auth = AUTH;
   try {

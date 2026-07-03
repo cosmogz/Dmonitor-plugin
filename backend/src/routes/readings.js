@@ -46,7 +46,9 @@ router.post('/', async (req, res) => {
     ]);
 
     // Enqueue for OpenMRS delivery: prefer Redis queue if available, else attempt async send
-    const job = { patient_external_id, reading: { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString() }, attempts: 0 };
+    // allow optional patient_info to be provided in the request body
+    const patient_info = req.body.patient_info || null;
+    const job = { patient_external_id, reading: { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString(), patient_info }, attempts: 0 };
     const REDIS_URL = process.env.REDIS_URL || '';
     if (REDIS_URL) {
       try {
