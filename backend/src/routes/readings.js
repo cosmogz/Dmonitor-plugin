@@ -3,6 +3,7 @@ const db = require('../db');
 
 const router = express.Router();
 const openmrs = require('../openmrs/adapter');
+const alerts = require('../alerts/engine');
 
 router.post('/', async (req, res) => {
   const { patient_external_id, value, unit, recorded_at } = req.body || {};
@@ -67,6 +68,15 @@ router.post('/', async (req, res) => {
         try { await openmrs.sendObservation(patient_external_id, job.reading); } catch (e) { console.error('OpenMRS send failed (non-fatal):', e.message || e); }
       })();
     }
+
+    // Evaluate alerts asynchronously (non-blocking)
+    (async () => {
+      try {
+        await alerts.evaluateAndCreateAlert(patientId, readingId, { value: numValue, unit: unitVal, recorded_at: recordedAt.toISOString(), type: 'glucose' });
+      } catch (e) {
+        console.error('Alert evaluation failed:', e.message || e);
+      }
+    })();
 
     res.status(201).json({ id: readingId, created_at: insert.rows[0].created_at });
   } catch (err) {

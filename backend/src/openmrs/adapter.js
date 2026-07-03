@@ -90,7 +90,7 @@ function buildFhirObservation(patientExternalId, reading) {
   const norm = mapReading(reading);
   const { value, unit, recorded_at } = norm;
   const effective = recorded_at || new Date().toISOString();
-  return {
+  const obs = {
     resourceType: 'Observation',
     code: {
       coding: [
@@ -104,13 +104,23 @@ function buildFhirObservation(patientExternalId, reading) {
       identifier: { system: 'urn:internal:patient', value: patientExternalId }
     },
     effectiveDateTime: effective,
-    valueQuantity: {
-      value: Number(value),
-      unit: unit || 'mg/dL',
-      system: 'http://unitsofmeasure.org',
-      code: unit || 'mg/dL'
-    }
   };
+
+  // if value is a composite (e.g., lipids), use total for valueQuantity and add components
+  if (value && typeof value === 'object') {
+    if (value.total != null) {
+      obs.valueQuantity = { value: Number(value.total), unit: unit || 'mg/dL', system: 'http://unitsofmeasure.org', code: unit || 'mg/dL' };
+    }
+    const comps = [];
+    if (value.hdl != null) comps.push({ code: { coding: [{ system: 'http://loinc.org', code: '2085-9', display: 'HDL Cholesterol' }] }, valueQuantity: { value: Number(value.hdl), unit: unit || 'mg/dL', system: 'http://unitsofmeasure.org' } });
+    if (value.ldl != null) comps.push({ code: { coding: [{ system: 'http://loinc.org', code: '13457-7', display: 'LDL Cholesterol' }] }, valueQuantity: { value: Number(value.ldl), unit: unit || 'mg/dL', system: 'http://unitsofmeasure.org' } });
+    if (value.triglycerides != null) comps.push({ code: { coding: [{ system: 'http://loinc.org', code: '2571-8', display: 'Triglyceride' }] }, valueQuantity: { value: Number(value.triglycerides), unit: unit || 'mg/dL', system: 'http://unitsofmeasure.org' } });
+    if (comps.length) obs.component = comps;
+  } else {
+    obs.valueQuantity = { value: Number(value), unit: unit || 'mg/dL', system: 'http://unitsofmeasure.org', code: unit || 'mg/dL' };
+  }
+
+  return obs;
 }
 
 async function sendObservation(patientExternalId, reading) {

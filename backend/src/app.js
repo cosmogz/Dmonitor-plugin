@@ -17,6 +17,10 @@ app.get('/api/v1/profile', auth.required, (req, res) => {
 const readings = require('./routes/readings');
 app.use('/api/v1/readings', readings);
 
+// Alerts endpoint
+const alerts = require('./routes/alerts');
+app.use('/api/v1/alerts', alerts);
+
 // Auth routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
