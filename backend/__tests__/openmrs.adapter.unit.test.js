@@ -18,3 +18,17 @@ test('default maps to glucose code when unknown type', () => {
   const obs = buildFhirObservation('ext-3', { value: 120 });
   expect(obs.code.coding[0].code).toBe('2339-0');
 });
+
+test('lipid mapping preserves components', () => {
+  const reading = { type: 'lipid', value: { total: 200, hdl: 50, ldl: 120, triglycerides: 150 }, unit: 'mg/dL' };
+  const obs = buildFhirObservation('ext-l', reading);
+  expect(obs.code.coding[0].code).toBe('2093-3');
+  // valueQuantity should use total by default
+  expect(obs.valueQuantity.value).toBeCloseTo(200);
+});
+
+test('creatinine mapping', () => {
+  const obs = buildFhirObservation('ext-c', { type: 'creatinine', value: 1.1 });
+  expect(obs.code.coding[0].code).toBe('2160-0');
+  expect(obs.valueQuantity.unit).toBe('mg/dL');
+});

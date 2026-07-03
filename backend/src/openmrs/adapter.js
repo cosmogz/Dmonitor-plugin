@@ -26,6 +26,27 @@ function mapReading(reading) {
     r.value = Number(reading.value);
     r.unit = reading.unit || '%';
   } else if (t === 'blood_pressure') {
+      } else if (t === 'lipid' || t === 'lipids' || t === 'cholesterol') {
+        // Expect reading.value to be object: { total, hdl, ldl, triglycerides }
+        r.code = reading.code || '2093-3';
+        r.code_display = reading.code_display || 'Cholesterol, Total';
+        r.value = reading.value || {};
+        r.unit = reading.unit || 'mg/dL';
+      } else if (t === 'creatinine') {
+        r.code = reading.code || '2160-0';
+        r.code_display = reading.code_display || 'Creatinine [Mass/volume] in Serum or Plasma';
+        r.value = Number(reading.value);
+        r.unit = reading.unit || 'mg/dL';
+      } else if (t === 'heart_rate' || t === 'pulse') {
+        r.code = reading.code || '8867-4';
+        r.code_display = reading.code_display || 'Heart rate';
+        r.value = Number(reading.value);
+        r.unit = reading.unit || 'beats/minute';
+      } else if (t === 'temperature' || t === 'temp') {
+        r.code = reading.code || '8310-5';
+        r.code_display = reading.code_display || 'Body temperature';
+        r.value = Number(reading.value);
+        r.unit = reading.unit || 'Cel';
     r.code = reading.code || '85354-9';
     r.code_display = reading.code_display || 'Blood pressure panel';
     r.value = reading.value; // expected object { systolic, diastolic }
@@ -37,6 +58,32 @@ function mapReading(reading) {
     r.code_display = reading.code_display || 'Glucose';
   }
   return r;
+}
+
+function buildPatientPayload(patientExternalId, opts = {}) {
+  // opts may contain { name, given, family, gender, birthdate, address, attributes }
+  const name = opts.name || opts.display_name || `Patient ${patientExternalId}`;
+  const given = opts.given || (opts.name ? opts.name.split(' ')[0] : 'Unknown');
+  const family = opts.family || (opts.name ? opts.name.split(' ').slice(1).join(' ') : `Patient-${patientExternalId}`);
+  const gender = (opts.gender || 'unknown').toLowerCase();
+  const birthdate = opts.birthdate || null;
+
+  const person = {
+    names: [{ givenName: given || 'Unknown', familyName: family || `Patient-${patientExternalId}` }],
+    gender: ['male','female','other','unknown'].includes(gender) ? gender : 'unknown'
+  };
+  if (birthdate) person.birthdate = birthdate;
+  if (opts.address) person.addresses = [opts.address];
+
+  const identifiers = [
+    { identifier: patientExternalId, identifierType: opts.identifierType || process.env.OPENMRS_DEFAULT_IDENTIFIER_TYPE || 'UNKNOWN' }
+  ];
+
+  if (opts.location || process.env.OPENMRS_DEFAULT_LOCATION) identifiers[0].location = opts.location || process.env.OPENMRS_DEFAULT_LOCATION;
+
+  const payload = { person, identifiers };
+  if (opts.attributes) payload.person.attributes = opts.attributes;
+  return payload;
 }
 
 function buildFhirObservation(patientExternalId, reading) {
