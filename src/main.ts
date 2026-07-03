@@ -10,6 +10,7 @@ import { authMiddleware } from './shared/auth.middleware';
 import { initDatabase } from './shared/db';
 import { versionInfo } from './config/version';
 import { metricsHandler, observeRequestDuration } from './metrics/metrics';
+import { rateLimiter } from './shared/rateLimiter';
 
 dotenv.config();
 
@@ -20,6 +21,9 @@ app.use(helmet());
 app.use(cors());
 app.use(json());
 app.use(morgan('combined'));
+
+// Apply a basic IP rate limiter early in the middleware chain
+app.use(rateLimiter);
 
 app.use((req, res, next) => {
   const start = process.hrtime.bigint();

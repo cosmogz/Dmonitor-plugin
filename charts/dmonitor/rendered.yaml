@@ -66,23 +66,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dmonitor-my-dmonitor
+  labels:
+    app.kubernetes.io/name: dmonitor
+    app.kubernetes.io/instance: my-dmonitor
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: dmonitor
-  ports:
-    - port: 3000
-      targetPort: 3000
-apiVersion: v1
-kind: Service
-metadata:
-  name: dmonitor-my-dmonitor
-  labels:
-    app: dmonitor
-spec:
-  type: ClusterIP
-  selector:
-    app: dmonitor
+    app.kubernetes.io/instance: my-dmonitor
   ports:
     - name: http
       port: 3000
@@ -108,28 +99,6 @@ spec:
         app.kubernetes.io/name: dmonitor
         app.kubernetes.io/instance: my-dmonitor
     spec:
-      containers:
-        - name: dmonitor
-          image: "cosmogz/dmonitor:latest"
-          imagePullPolicy: IfNotPresent
-          command: ["/bin/sh","-c","sleep 3600"]
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dmonitor-my-dmonitor
-  labels:
-    app: dmonitor
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: dmonitor
-  template:
-    metadata:
-      labels:
-        app: dmonitor
-    spec:
-      serviceAccountName: dmonitor-sa
       containers:
         - name: dmonitor
           image: "cosmogz/dmonitor:latest"
