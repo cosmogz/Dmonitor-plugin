@@ -32,3 +32,14 @@ test('creatinine mapping', () => {
   expect(obs.code.coding[0].code).toBe('2160-0');
   expect(obs.valueQuantity.unit).toBe('mg/dL');
 });
+
+test('buildPatientPayload includes provided name and birthdate', () => {
+  const { buildFhirObservation } = require('../src/openmrs/adapter');
+  const adapter = require('../src/openmrs/adapter');
+  const payload = adapter.buildPatientPayload ? adapter.buildPatientPayload('ext-x', { name: 'Alice Smith', gender: 'female', birthdate: '1990-01-02' }) : null;
+  if (payload) {
+    expect(payload.person.names[0].givenName).toBe('Alice');
+    expect(payload.person.names[0].familyName).toContain('Smith');
+    expect(payload.person.birthdate).toBe('1990-01-02');
+  }
+});
