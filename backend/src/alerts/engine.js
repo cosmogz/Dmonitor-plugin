@@ -1,4 +1,11 @@
 const db = require('../db');
+const promClient = require('prom-client');
+
+const alertsCreated = new promClient.Counter({
+  name: 'dmonitor_alerts_created_total',
+  help: 'Total number of alerts created',
+  labelNames: ['severity', 'type']
+});
 
 // Simple glucose alert rules (Milestone 4 initial):
 // - value < 54 => severe_hypoglycemia (critical)
@@ -28,19 +35,13 @@ async function evaluateAndCreateAlert(patientId, readingId, reading) {
   const res = await db.query(q, params);
     const alertId = res.rows && res.rows[0] ? res.rows[0].id : null;
 
-    // create a notification record and enqueue for delivery (default channel: webhook)
+    // fan-out notifications per patient preferences, falling back to default channel
     if (alertId) {
       try {
-        const notifQ = `INSERT INTO notifications (alert_id, channel, payload) VALUES ($1,$2,$3) RETURNING id`;
-        const notifParams = [alertId, process.env.DEFAULT_NOTIFICATION_CHANNEL || 'webhook', JSON.stringify({ alertId, patientId, rule })];
-        const nr = await db.query(notifQ, notifParams);
-        const notifId = nr.rows && nr.rows[0] ? nr.rows[0].id : null;
-        if (notifId && process.env.REDIS_URL) {
-          const Redis = require('ioredis');
-          const r = new Redis(process.env.REDIS_URL);
-          await r.rpush('notifications:queue', JSON.stringify({ notification_id: notifId, channel: process.env.DEFAULT_NOTIFICATION_CHANNEL || 'webhook', payload: { alertId, rule } }));
-          r.disconnect();
-        }
+        alertsCreated.inc({ severity: rule.severity || 'unknown', type: rule.type || 'unknown' }, 1);
+      } catch (e) { /* metrics should not break flow */ }
+      try {
+        await _enqueueNotifications(alertId, patientId, rule);
       } catch (e) {
         console.error('failed to create/enqueue notification', e.message || e);
       }
@@ -50,3 +51,60 @@ async function evaluateAndCreateAlert(patientId, readingId, reading) {
 }
 
 module.exports = { evaluateAndCreateAlert, classifyGlucose };
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+const SEVERITY_ORDINAL = { warning: 1, critical: 2 };
+function _severityOrdinal(s) { return SEVERITY_ORDINAL[s] || 0; }
+
+/**
+ * Resolve per-patient notification preferences and enqueue one notification
+ * per matching preference.  Falls back to DEFAULT_NOTIFICATION_CHANNEL when
+ * the patient has no preferences row.
+ */
+async function _enqueueNotifications(alertId, patientId, rule) {
+  let prefs = [];
+  try {
+    const pRes = await db.query(
+      `SELECT channel, destination, severity_min FROM notification_preferences
+       WHERE patient_id=$1 AND enabled=TRUE`,
+      [patientId]
+    );
+    prefs = pRes.rows || [];
+  } catch (e) {
+    // table may not exist yet (migration not applied) or mock returns undefined — fall back silently
+    if (e && e.message && !/does not exist/.test(e.message) && !/Cannot read/.test(e.message)) throw e;
+  }
+
+  // filter by severity_min preference
+  const filtered = prefs.filter(p => {
+    const minOrd = _severityOrdinal(p.severity_min || 'warning');
+    return _severityOrdinal(rule.severity) >= minOrd;
+  });
+
+  // If the patient has no preferences, fall back to the global default channel
+  const targets = filtered.length > 0
+    ? filtered
+    : [{ channel: process.env.DEFAULT_NOTIFICATION_CHANNEL || 'webhook', destination: null }];
+
+  const { buildMessage } = require('../notifications/templates');
+
+  let redis = null;
+  if (process.env.REDIS_URL) {
+    const Redis = require('ioredis');
+    redis = new Redis(process.env.REDIS_URL);
+  }
+
+  for (const pref of targets) {
+    const msg = buildMessage(pref.channel, rule, patientId, alertId);
+    const payload = { alertId, patientId, rule, to: pref.destination, subject: msg.subject, body: msg.body };
+    const notifQ = `INSERT INTO notifications (alert_id, channel, payload) VALUES ($1,$2,$3) RETURNING id`;
+    const nr = await db.query(notifQ, [alertId, pref.channel, JSON.stringify(payload)]);
+    const notifId = nr.rows && nr.rows[0] ? nr.rows[0].id : null;
+    if (notifId && redis) {
+      await redis.rpush('notifications:queue', JSON.stringify({ notification_id: notifId, channel: pref.channel, payload }));
+    }
+  }
+
+  if (redis) redis.disconnect();
+}

@@ -28,7 +28,11 @@
     "nodemailer": "^6.9.4",
     "pg": "^8.10.0",
     "pino": "^8.18.0",
-    "pino-http": "^9.0.0"
+    "pino-http": "^9.0.0",
+    "prom-client": "^14.0.0"
+  },
+  "optionalDependencies": {
+    "twilio": "^4.0.0"
   },
   "devDependencies": {
     "jest": "^29.6.4",

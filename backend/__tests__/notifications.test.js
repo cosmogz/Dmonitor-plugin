@@ -5,8 +5,9 @@ const engine = require('../src/alerts/engine');
 test('creating alert enqueues notification when redis configured', async () => {
   // mock alerts insert
   db.query = jest.fn()
-    .mockResolvedValueOnce({ rows: [{ id: 55 }] }) // insert alert
-    .mockResolvedValueOnce({ rows: [{ id: 77 }] }); // insert notification
+    .mockResolvedValueOnce({ rows: [{ id: 55 }] })  // insert alert
+    .mockResolvedValueOnce({ rows: [] })             // select notification_preferences (none)
+    .mockResolvedValueOnce({ rows: [{ id: 77 }] }); // insert notification (fallback channel)
 
   process.env.REDIS_URL = '';
   const id = await engine.evaluateAndCreateAlert(1, 2, { value: 350 });

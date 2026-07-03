@@ -5,12 +5,27 @@ const pinoHttp = require('pino-http');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const promClient = require('prom-client');
 const auth = require('./middleware/auth');
 const requestId = require('./middleware/requestId');
 const errorHandler = require('./middleware/errorHandler');
 const db = require('./db');
 
 const app = express();
+
+// Prometheus metrics
+const collectDefaultMetrics = promClient.collectDefaultMetrics;
+collectDefaultMetrics({ timeout: 5000 });
+
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', promClient.register.contentType);
+    const metrics = await promClient.register.metrics();
+    res.send(metrics);
+  } catch (e) {
+    res.status(500).send('error');
+  }
+});
 
 // Security headers
 app.use(helmet());
@@ -66,6 +81,10 @@ app.use('/api/v1/notifications', notifications);
 // Auth routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
+
+// Notification preferences (per-patient channel/recipient configuration)
+const notifPrefs = require('./routes/notification_preferences');
+app.use('/api/v1/notification-preferences', notifPrefs);
 
 // Centralized error handler (must be last)
 app.use(errorHandler);
