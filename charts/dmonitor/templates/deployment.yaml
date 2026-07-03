@@ -57,3 +57,33 @@ spec:
           readinessProbe:
 {{ toYaml .Values.probes.readiness | indent 12 }}
           {{- end }}
+          {{- if or .Values.oidc.enabled .Values.provisioning.enabled }}
+          volumeMounts:
+            {{- if .Values.oidc.enabled }}
+            - name: grafana-ini
+              mountPath: /etc/grafana/grafana.ini
+              subPath: grafana.ini
+            {{- end }}
+            {{- if .Values.provisioning.enabled }}
+            - name: grafana-provisioning
+              mountPath: /etc/grafana/provisioning
+            - name: grafana-dashboards
+              mountPath: /var/lib/grafana/dashboards
+            {{- end }}
+          {{- end }}
+      {{- if or .Values.oidc.enabled .Values.provisioning.enabled }}
+      volumes:
+        {{- if .Values.oidc.enabled }}
+        - name: grafana-ini
+          configMap:
+            name: {{ include "dmonitor.fullname" . }}-grafana-ini
+        {{- end }}
+        {{- if .Values.provisioning.enabled }}
+        - name: grafana-provisioning
+          configMap:
+            name: {{ include "dmonitor.fullname" . }}-grafana-provisioning
+        - name: grafana-dashboards
+          configMap:
+            name: {{ include "dmonitor.fullname" . }}-grafana-dashboards
+        {{- end }}
+      {{- end }}

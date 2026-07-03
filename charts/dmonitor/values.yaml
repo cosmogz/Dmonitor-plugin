@@ -40,6 +40,16 @@ oidc:
     - email
   tlsSkipVerify: false
 
+# Grafana provisioning (provisioning by configmaps)
+provisioning:
+  enabled: false
+  # providerConfig: raw YAML content for grafana provisioning providers file
+  providerConfig: |-
+    apiVersion: 1
+    providers: []
+  # dashboards: map of filename -> JSON/YAML content
+  dashboards: {}
+
 replicaCount: 2
 image:
   repository: cosmogz/dmonitor
