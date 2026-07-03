@@ -15,6 +15,23 @@ router.get('/', auth.optional, async (req, res) => {
   }
 });
 
+// Dead-letter metrics: counts by status
+router.get('/metrics', auth.optional, async (req, res) => {
+  try {
+    const r = await db.query(`
+      SELECT status, COUNT(*) AS count
+      FROM notifications
+      GROUP BY status
+    `);
+    const metrics = {};
+    for (const row of r.rows) metrics[row.status] = parseInt(row.count, 10);
+    res.json({ metrics });
+  } catch (err) {
+    console.error('notifications metrics error', err.message || err);
+    res.status(500).json({ error: 'internal error' });
+  }
+});
+
 // Retry a notification (re-enqueue)
 router.post('/:id/retry', auth.required, async (req, res) => {
   const id = Number(req.params.id);

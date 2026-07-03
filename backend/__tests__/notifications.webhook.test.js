@@ -2,7 +2,9 @@ jest.mock('axios');
 const axios = require('axios');
 
 process.env.NOTIFICATION_WEBHOOK_URL = 'http://example.local/hook';
-const { deliverWebhook, backoffSeconds } = require('../src/notifications/worker');
+const { deliverWebhook, backoffSeconds, shutdownRedis } = require('../src/notifications/worker');
+
+afterAll(() => shutdownRedis());
 
 test('deliverWebhook posts to configured URL and returns true on 2xx', async () => {
   axios.post.mockResolvedValueOnce({ status: 200 });

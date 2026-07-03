@@ -4,7 +4,9 @@ const nodemailer = require('nodemailer');
 process.env.SMTP_URL = 'smtp://user:pass@smtp.example';
 process.env.NOTIFICATION_DEFAULT_EMAIL = 'test@example.com';
 
-const { deliverEmail } = require('../src/notifications/worker');
+const { deliverEmail, shutdownRedis } = require('../src/notifications/worker');
+
+afterAll(() => shutdownRedis());
 
 test('deliverEmail sends mail via nodemailer', async () => {
   const sendMail = jest.fn().mockResolvedValueOnce({ messageId: 'm1' });
