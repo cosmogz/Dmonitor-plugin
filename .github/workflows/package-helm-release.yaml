@@ -1,0 +1,30 @@
+name: Package and publish Helm chart
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  package-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Helm
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Package chart
+        run: |
+          mkdir -p artifacts
+          helm package charts/dmonitor --destination artifacts
+          ls -la artifacts
+
+      - name: Upload packaged chart to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+*** End Patch

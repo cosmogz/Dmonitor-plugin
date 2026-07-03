@@ -63,3 +63,28 @@ jobs:
           set -e
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm lint charts/dmonitor || true
+      - name: Install kubeconform
+        run: |
+          set -e
+          KC_VERSION="v0.8.26"
+          curl -fsSL -o /tmp/kubeconform.tar.gz "https://github.com/yannh/kubeconform/releases/download/${KC_VERSION}/kubeconform_${KC_VERSION}_linux_x86_64.tar.gz"
+          sudo tar -C /usr/local/bin -xzf /tmp/kubeconform.tar.gz kubeconform
+          kubeconform -version || true
+
+      - name: Validate manifests with kubeconform
+        run: |
+          set -e
+          OVERLAYS=(
+            manifests/grafana/overlay
+            manifests/grafana/overlay/examples/official
+            manifests/grafana/overlay/examples/bitnami
+          )
+          for overlay in "${OVERLAYS[@]}"; do
+            if [ -d "$overlay" ]; then
+              echo "kustomize build + kubeconform for: $overlay"
+              kubectl kustomize "$overlay" > /tmp/manifest.yaml
+              kubeconform -summary -strict -quiet -filename /tmp/manifest.yaml || (echo "Schema validation failed for $overlay" && exit 1)
+            else
+              echo "Skipping missing overlay: $overlay"
+            fi
+          done
