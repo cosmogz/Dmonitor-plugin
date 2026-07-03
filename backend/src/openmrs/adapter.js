@@ -234,4 +234,4 @@ async function findOrCreatePatientUuid(patientExternalId, opts = {}) {
   return null;
 }
 
-module.exports = { sendObservation, buildFhirObservation };
+module.exports = { sendObservation, buildFhirObservation, buildPatientPayload, mapReading };
