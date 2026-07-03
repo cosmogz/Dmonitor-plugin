@@ -1,3 +1,42 @@
+# Backend README
+
+Environment variables used by the backend (non-exhaustive):
+
+- `DATABASE_URL` - Postgres connection string, e.g. `postgres://postgres:postgres@127.0.0.1:5432/dmonitor`
+- `REDIS_URL` - Redis connection string, e.g. `redis://127.0.0.1:6379`
+- `PORT` - HTTP port to listen on (default 4002)
+
+Notification worker specific variables:
+
+- `NOTIFICATION_WEBHOOK_URL` - If set, webhook notifications will be POSTed to this URL as JSON. Example: `http://127.0.0.1:4321/hook`
+- `NOTIFICATION_MAX_ATTEMPTS` - Maximum retry attempts before marking a notification as `dead` (default `5`).
+- `NOTIFICATION_BASE_DELAY` - Base delay in seconds for exponential backoff (default `5`).
+
+Running the backend locally
+
+1. Start Postgres and Redis (docker recommended):
+
+```bash
+docker run --name dmonitor-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dmonitor -p 5432:5432 -d postgres:15
+docker run --name dmonitor-redis -p 6379:6379 -d redis:7-alpine
+```
+
+2. Install deps and run migrations:
+
+```bash
+cd backend
+npm install
+export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/dmonitor
+node scripts/migrate.js
+```
+
+3. Start services (example):
+
+```bash
+PORT=4002 REDIS_URL=redis://127.0.0.1:6379 NOTIFICATION_WEBHOOK_URL=http://127.0.0.1:4321/hook node src/index.js &
+node src/openmrs/worker.js &
+node src/notifications/worker.js &
+```
 # Dmonitor backend — Local dev & tests
 
 Quick steps to run the backend and integration test locally.
