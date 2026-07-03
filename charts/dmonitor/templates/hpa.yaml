@@ -20,4 +20,17 @@ spec:
         target:
           type: Utilization
           averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+{{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (gt .Values.autoscaling.targetMemoryUtilizationPercentage 0) }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}
+{{- if .Values.autoscaling.customMetrics }}
+{{- range .Values.autoscaling.customMetrics }}
+    - {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
 {{- end }}

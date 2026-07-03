@@ -117,3 +117,24 @@ helm install dmonitor charts/dmonitor -n default --create-namespace
 ```
 
 Values can be overridden with `-f` or `--set` (image.tag, replicaCount, metrics.serviceMonitor.namespace, etc.).
+
+Ingress
+-------
+
+To expose the service via Ingress, set the `ingress` block in `values.yaml`. Example:
+
+```yaml
+ingress:
+	enabled: true
+	hosts:
+		- host: grafana.example.com
+			paths:
+				- path: /
+					pathType: Prefix
+	tls:
+		- hosts:
+				- grafana.example.com
+			secretName: grafana-tls
+```
+
+The chart renders a `networking.k8s.io/v1` Ingress when `ingress.enabled` is true. Provide annotations and `ingress.className` as needed for your cluster's ingress controller.

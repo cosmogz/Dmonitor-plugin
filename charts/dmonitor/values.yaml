@@ -90,6 +90,19 @@ autoscaling:
   maxReplicas: 5
   # target CPU utilization percentage for autoscaling (v2 uses metrics; this is a simple default)
   targetCPUUtilizationPercentage: 50
+  # target memory utilization percentage (optional)
+  targetMemoryUtilizationPercentage: 0
+  # customMetrics: list of additional HPA metric blocks to include (each entry rendered verbatim)
+  # Example:
+  # customMetrics:
+  #   - type: Pods
+  #     pods:
+  #       metric:
+  #         name: some_custom_metric
+  #       target:
+  #         type: AverageValue
+  #         averageValue: 100
+  customMetrics: []
 
 # Ingress
 ingress:
