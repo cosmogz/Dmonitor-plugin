@@ -1,3 +1,10 @@
+Minimal Helm chart scaffold for dmonitor.
+
+Usage:
+
+```sh
+helm install my-dmonitor ./charts/dmonitor
+```
 Dmonitor Helm chart
 
 Usage:

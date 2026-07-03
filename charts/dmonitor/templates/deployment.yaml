@@ -3,6 +3,30 @@ kind: Deployment
 metadata:
   name: {{ include "dmonitor.fullname" . }}
   labels:
+    app.kubernetes.io/name: {{ include "dmonitor.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dmonitor.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "dmonitor.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: dmonitor
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh","-c","sleep 3600"]
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dmonitor.fullname" . }}
+  labels:
     app: {{ include "dmonitor.name" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
