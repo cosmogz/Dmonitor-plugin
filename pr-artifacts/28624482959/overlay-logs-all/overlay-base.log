@@ -1,0 +1,50 @@
+=== Server-side dry-run for manifests/grafana/overlay ===
+No cloud configured; running local kustomize build (kubectl kustomize)
+apiVersion: v1
+data:
+  dmonitor-dashboard.json: |
+    {
+      "annotations": {"list":[]},
+      "panels": [
+        {
+          "type": "gauge",
+          "title": "OpenMRS Circuit Open",
+          "targets": [
+            { "expr": "openmrs_circuit_open", "legendFormat": "" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "OpenMRS circuit opens (count, 5m)",
+          "targets": [
+            { "expr": "increase(openmrs_circuit_open_count[5m])", "legendFormat": "" }
+          ]
+        }
+      ],
+      "schemaVersion": 30,
+      "title": "Dmonitor Overview",
+      "version": 1
+    }
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+---
+apiVersion: v1
+data:
+  dmonitor-provider.yml: |
+    apiVersion: 1
+    providers:
+      - name: 'Dmonitor'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards
+kind: ConfigMap
+metadata:
+  name: grafana-provisioning
+  namespace: monitoring
+Local kustomize build for manifests/grafana/overlay succeeded

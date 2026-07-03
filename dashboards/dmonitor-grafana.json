@@ -1,0 +1,22 @@
+{
+  "annotations": {"list":[]},
+  "panels": [
+    {
+      "type": "gauge",
+      "title": "OpenMRS Circuit Open",
+      "targets": [
+        { "expr": "openmrs_circuit_open", "legendFormat": "" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "OpenMRS circuit opens (count, 5m)",
+      "targets": [
+        { "expr": "increase(openmrs_circuit_open_count[5m])", "legendFormat": "" }
+      ]
+    }
+  ],
+  "schemaVersion": 30,
+  "title": "Dmonitor Overview",
+  "version": 1
+}

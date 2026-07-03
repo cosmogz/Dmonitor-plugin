@@ -1,0 +1,79 @@
+name: Cleanup old GHCR PR images
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # weekly on Sunday at 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  cleanup-ghcr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Cleanup old PR images from GHCR
+        env:
+          OWNER: cosmogz
+          PACKAGE: dmonitor
+          KEEP_PER_PR: 3
+          TOKEN: ${{ secrets.PACKAGE_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "Using owner=$OWNER package=$PACKAGE keep=$KEEP_PER_PR"
+          if [ -z "$TOKEN" ]; then
+            echo "No token available in secrets.PACKAGE_PAT or GITHUB_TOKEN; aborting." >&2
+            exit 1
+          fi
+
+          # Fetch all package versions for the container package
+          echo "Fetching package versions..."
+          versions_json=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token $TOKEN" "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE}/versions?per_page=100")
+          if [ -z "$versions_json" ] || [ "$versions_json" = "null" ]; then
+            echo "No package versions found or failed to fetch." 
+            exit 0
+          fi
+
+          # Build a list grouped by PR number (tags like pr-123 or pr-123-<sha>)
+          declare -A prs
+          echo "$versions_json" | jq -c '.[]' | while read -r ver; do
+            id=$(echo "$ver" | jq -r '.id')
+            created=$(echo "$ver" | jq -r '.created_at')
+            tags=$(echo "$ver" | jq -r '.metadata.container.tags[]?')
+            for tag in $tags; do
+              if [[ "$tag" =~ ^pr-([0-9]+)(-|$) ]]; then
+                prnum=${BASH_REMATCH[1]}
+                # store as JSON lines: prnum|created|id|tag
+                echo "${prnum}|${created}|${id}|${tag}"
+              fi
+            done
+          done > /tmp/pr_versions.txt
+
+          if [ ! -s /tmp/pr_versions.txt ]; then
+            echo "No PR images found; nothing to clean."; exit 0
+          fi
+
+          # For each PR, sort by created desc and delete older than KEEP_PER_PR
+          awk -F'|' '{ print $0 }' /tmp/pr_versions.txt | cut -d'|' -f1 | sort -u | while read -r pr; do
+            echo "Processing PR $pr"
+            grep "^${pr}|" /tmp/pr_versions.txt | sort -t'|' -k2 -r | awk -F'|' '{ print $3 "|" $4 }' > /tmp/versions_for_pr.txt
+            i=0
+            while IFS='|' read -r verid vertag; do
+              i=$((i+1))
+              if [ $i -le $KEEP_PER_PR ]; then
+                echo "Keeping ${vertag} (id=${verid})"
+              else
+                echo "Deleting ${vertag} (id=${verid})"
+                resp=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE -H "Accept: application/vnd.github+json" -H "Authorization: token $TOKEN" "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE}/versions/${verid}")
+                if [ "$resp" -ge 200 ] && [ "$resp" -lt 300 ]; then
+                  echo "Deleted version id=${verid}"
+                else
+                  echo "Failed to delete version id=${verid}, http_code=$resp" >&2
+                fi
+              fi
+            done
+          done
+
+          echo "Cleanup complete."

@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dmonitor-alerts
+  namespace: monitoring
+spec:
+  groups:
+    - name: dmonitor.rules
+      rules:
+        - alert: OpenMRSIntegrationCircuitOpen
+          expr: openmrs_circuit_open == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OpenMRS integration circuit is open"
+            description: "The Dmonitor to OpenMRS circuit breaker is open for more than 5 minutes."
+        - alert: OpenMRSIntegrationErrors
+          expr: increase(openmrs_circuit_open_count[5m]) > 0
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "OpenMRS integration errors detected"
+            description: "There have been OpenMRS integration failures in the last 5 minutes."

@@ -1,0 +1,3 @@
+Starting CRD sanity check
+Missing required CRDs: servicemonitors.monitoring.coreos.com prometheusrules.monitoring.coreos.com podmonitors.monitoring.coreos.com externalsecrets.external-secrets.io
+Install the corresponding operators (Prometheus Operator, ExternalSecrets) in the staging cluster before running this check.

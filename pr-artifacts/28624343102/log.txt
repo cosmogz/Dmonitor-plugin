@@ -1,0 +1,592 @@
+pr-server-dryrun	Set up job	﻿2026-07-02T22:01:33.8603544Z Current runner version: '2.335.1'
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8657053Z ##[group]Runner Image Provisioner
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8658762Z Hosted Compute Agent
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8659916Z Version: 20260624.560
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8661119Z Commit: 925d229a51159bc391ae97e54a2dd1fe20af789d
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8662746Z Build Date: 2026-06-24T18:26:47Z
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8664233Z Worker ID: {e932556c-a538-42b2-8b20-721c956dcb3b}
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8665698Z Azure Region: northcentralus
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8667015Z ##[endgroup]
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8669313Z ##[group]Operating System
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8670405Z Ubuntu
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8671488Z 24.04.4
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8682666Z LTS
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8683733Z ##[endgroup]
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8684784Z ##[group]Runner Image
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8685848Z Image: ubuntu-24.04
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8686942Z Version: 20260628.225.1
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8688779Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260628.225/images/ubuntu/Ubuntu2404-Readme.md
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8691869Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260628.225
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8698419Z ##[endgroup]
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8700724Z ##[group]GITHUB_TOKEN Permissions
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8724420Z Contents: read
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8725468Z Metadata: read
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8726365Z Packages: read
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8727487Z ##[endgroup]
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8730402Z Secret source: Actions
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.8731762Z Prepare workflow directory
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.9289274Z Prepare all required actions
+pr-server-dryrun	Set up job	2026-07-02T22:01:33.9346061Z Getting action download info
+pr-server-dryrun	Set up job	2026-07-02T22:01:34.1737707Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+pr-server-dryrun	Set up job	2026-07-02T22:01:34.2519375Z Download action repository 'aws-actions/configure-aws-credentials@v2' (SHA:5fd3084fc36e372ff1fff382a39b10d03659f355)
+pr-server-dryrun	Set up job	2026-07-02T22:01:34.6603872Z Download action repository 'google-github-actions/auth@v1' (SHA:3a3c4c57d294ef65efaaee4ff17b22fa88dd3c69)
+pr-server-dryrun	Set up job	2026-07-02T22:01:34.9534966Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+pr-server-dryrun	Set up job	2026-07-02T22:01:35.2158410Z Complete job name: pr-server-dryrun
+pr-server-dryrun	Run actions/checkout@v4	﻿2026-07-02T22:01:35.3027564Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3036919Z ##[group]Run actions/checkout@v4
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3037697Z with:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3038181Z   repository: cosmogz/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3042206Z   token: ***
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3042869Z   ssh-strict: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3043329Z   ssh-user: git
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3043798Z   persist-credentials: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3044300Z   clean: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3044760Z   sparse-checkout-cone-mode: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3045318Z   fetch-depth: 1
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3045766Z   fetch-tags: false
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3046223Z   show-progress: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3046689Z   lfs: false
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3047114Z   submodules: false
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3047616Z   set-safe-directory: true
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.3048374Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4286022Z Syncing repository: cosmogz/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4288666Z ##[group]Getting Git version info
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4290053Z Working directory is '/home/runner/work/Dmonitor-plugin/Dmonitor-plugin'
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4291944Z [command]/usr/bin/git version
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4360351Z git version 2.54.0
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4376238Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4383777Z Temporarily overriding HOME='/home/runner/work/_temp/76e59d56-488a-4326-90ec-777294583e3d' before making global git config changes
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4386829Z Adding repository directory to the temporary git global config as a safe directory
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4394817Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dmonitor-plugin/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4464765Z Deleting the contents of '/home/runner/work/Dmonitor-plugin/Dmonitor-plugin'
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4467082Z ##[group]Initializing the repository
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4469055Z [command]/usr/bin/git init /home/runner/work/Dmonitor-plugin/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4640490Z hint: Using 'master' as the name for the initial branch. This default branch name
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4644245Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4647028Z hint: to use in all of your new repositories, which will suppress this warning,
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4652721Z hint: call:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4677946Z hint:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4679239Z hint: 	git config --global init.defaultBranch <name>
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4680913Z hint:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4682646Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4685114Z hint: 'development'. The just-created branch can be renamed via this command:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4686795Z hint:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4688056Z hint: 	git branch -m <name>
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4689337Z hint:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4691141Z hint: Disable this message with "git config set advice.defaultBranchName false"
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4694056Z Initialized empty Git repository in /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/.git/
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4698722Z [command]/usr/bin/git remote add origin https://github.com/cosmogz/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4707272Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4709580Z ##[group]Disabling automatic garbage collection
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4711369Z [command]/usr/bin/git config --local gc.auto 0
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4792610Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4814137Z ##[group]Setting up auth
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4833739Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.4847662Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.5284815Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.5330050Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.5673863Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.5708709Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.5994868Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.6054744Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.6073831Z ##[group]Fetching the repository
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.6078539Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +685b5b819b414751f55f1808f624d3c6eb0b6c02:refs/remotes/pull/1/merge
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9445464Z From https://github.com/cosmogz/Dmonitor-plugin
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9448877Z  * [new ref]         685b5b819b414751f55f1808f624d3c6eb0b6c02 -> pull/1/merge
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9510055Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9511601Z ##[group]Determining the checkout info
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9513954Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9517812Z [command]/usr/bin/git sparse-checkout disable
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9560413Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9633992Z ##[group]Checking out the ref
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9635388Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1/merge
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9769121Z Note: switching to 'refs/remotes/pull/1/merge'.
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9780956Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9791512Z You are in 'detached HEAD' state. You can look around, make experimental
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9804766Z changes and commit them, and you can discard any commits you make in this
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9806802Z state without impacting any branches by switching back to a branch.
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9808196Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9809136Z If you want to create a new branch to retain commits you create, you may
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9810869Z do so (now or later) by using -c with the switch command. Example:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9812170Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9813336Z   git switch -c <new-branch-name>
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9814257Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9814899Z Or undo this operation with:
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9815716Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9816275Z   git switch -
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9816917Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9817781Z Turn off this advice by setting config variable advice.detachedHead to false
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9818925Z 
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9820208Z HEAD is now at 685b5b8 Merge b6e6a9797afc7d136a0c4a28a29ed7d7a859bb43 into a78591d2adb16abcfc2043da93c04e05bcd84488
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9824912Z ##[endgroup]
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9859651Z [command]/usr/bin/git log -1 --format=%H
+pr-server-dryrun	Run actions/checkout@v4	2026-07-02T22:01:35.9880016Z 685b5b819b414751f55f1808f624d3c6eb0b6c02
+pr-server-dryrun	Install kubectl	﻿2026-07-02T22:01:36.0212790Z ##[group]Run set -e
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0213462Z [36;1mset -e[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0213999Z [36;1mKUBECTL_VERSION=v1.26.0[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0214956Z [36;1mcurl -fsSL -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0215895Z [36;1mchmod +x kubectl[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0216468Z [36;1msudo mv kubectl /usr/local/bin/[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0217090Z [36;1mkubectl version --client[0m
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0390717Z shell: /usr/bin/bash -e {0}
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.0391340Z ##[endgroup]
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.4885227Z WARNING: This version information is deprecated and will be replaced with the output from kubectl version --short.  Use --output=yaml|json to get the full version.
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.4890045Z Client Version: version.Info{Major:"1", Minor:"26", GitVersion:"v1.26.0", GitCommit:"b46a3f887ca979b1a5d14fd39cb1af43e7e5d12d", GitTreeState:"clean", BuildDate:"2022-12-08T19:58:30Z", GoVersion:"go1.19.4", Compiler:"gc", Platform:"linux/amd64"}
+pr-server-dryrun	Install kubectl	2026-07-02T22:01:36.4895280Z Kustomize Version: v4.5.7
+pr-server-dryrun	Install kustomize	﻿2026-07-02T22:01:36.4970691Z ##[group]Run set -e
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.4971641Z [36;1mset -e[0m
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.4972797Z [36;1mKUSTOMIZE_VERSION=v5.1.0[0m
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.4974637Z [36;1mcurl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION#v}_linux_amd64.tar.gz" | tar xz[0m
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.4976487Z [36;1msudo mv kustomize /usr/local/bin/[0m
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.4977509Z [36;1mkustomize version[0m
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.5011699Z shell: /usr/bin/bash -e {0}
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.5012896Z ##[endgroup]
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.6480841Z 
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.6481880Z gzip: stdin: not in gzip format
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.6485862Z tar: Child returned status 1
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.6491616Z tar: Error is not recoverable: exiting now
+pr-server-dryrun	Install kustomize	2026-07-02T22:01:36.6504432Z ##[error]Process completed with exit code 2.
+pr-server-dryrun	Upload CRD check log (always)	﻿2026-07-02T22:01:36.6726624Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6729924Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6730785Z with:
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6731463Z   name: crd-check
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6732569Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/crd-check.log
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6733644Z   if-no-files-found: warn
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6734415Z   compression-level: 6
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6735149Z   overwrite: false
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6735884Z   include-hidden-files: false
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.6736664Z ##[endgroup]
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.8415592Z (node:2105) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.8418963Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload CRD check log (always)	2026-07-02T22:01:36.8455802Z ##[warning]No files were found with the provided path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/crd-check.log. No artifacts will be uploaded.
+pr-server-dryrun	Ensure per-overlay log files	﻿2026-07-02T22:01:36.8749903Z ##[group]Run set -e
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8751176Z [36;1mset -e[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8752553Z [36;1mcd $GITHUB_WORKSPACE[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8754412Z [36;1mfor f in overlay-base.log overlay-official.log overlay-bitnami.log crd-check.log; do[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8756328Z [36;1m  if [ ! -f "$f" ]; then[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8757667Z [36;1m    echo "No log available for $f" > "$f"[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8759035Z [36;1m  fi[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8760099Z [36;1mdone[0m
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8820971Z shell: /usr/bin/bash -e {0}
+pr-server-dryrun	Ensure per-overlay log files	2026-07-02T22:01:36.8822648Z ##[endgroup]
+pr-server-dryrun	Upload overlay-base artifact	﻿2026-07-02T22:01:36.9091234Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9096363Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9097747Z with:
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9098842Z   name: overlay-base
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9100408Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-base.log
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9102208Z   if-no-files-found: warn
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9103643Z   compression-level: 6
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9104850Z   overwrite: false
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9106042Z   include-hidden-files: false
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:36.9107316Z ##[endgroup]
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.0848938Z (node:2118) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.0852784Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.0920575Z With the provided path, there will be 1 file uploaded
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.0924347Z Artifact name is valid!
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.1136497Z Root directory input is valid!
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.3383156Z Beginning upload of artifact content to blob storage
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.3539276Z (node:2118) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.4504899Z Uploaded bytes 186
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.4836427Z Finished uploading artifact content to blob storage!
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.4838705Z SHA256 digest of uploaded artifact zip is b947b4efa46a29104200c64ae0951406deb03a68c7a8327e5c4cb8a437f35186
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.4840509Z Finalizing artifact upload
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.6796431Z Artifact overlay-base.zip successfully finalized. Artifact ID 8052679860
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.6799442Z Artifact overlay-base has been successfully uploaded! Final size is 186 bytes. Artifact ID is 8052679860
+pr-server-dryrun	Upload overlay-base artifact	2026-07-02T22:01:37.6803465Z Artifact download URL: https://github.com/cosmogz/Dmonitor-plugin/actions/runs/28624343102/artifacts/8052679860
+pr-server-dryrun	Upload overlay-official artifact	﻿2026-07-02T22:01:37.6969741Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6978668Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6980448Z with:
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6981528Z   name: overlay-official
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6983519Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-official.log
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6985282Z   if-no-files-found: warn
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6986226Z   compression-level: 6
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6987374Z   overwrite: false
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6988233Z   include-hidden-files: false
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.6989225Z ##[endgroup]
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.8707683Z (node:2130) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.8715296Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.9265128Z With the provided path, there will be 1 file uploaded
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.9473322Z Artifact name is valid!
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:37.9475530Z Root directory input is valid!
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.0984344Z Beginning upload of artifact content to blob storage
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.1146751Z (node:2130) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.2665241Z Uploaded bytes 198
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.2923966Z Finished uploading artifact content to blob storage!
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.2928184Z SHA256 digest of uploaded artifact zip is f116d49c25a97626107560729ec9c0434c30d2a07f702e4997f8c2aeb185ddd4
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.2931973Z Finalizing artifact upload
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.4954498Z Artifact overlay-official.zip successfully finalized. Artifact ID 8052680083
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.4957805Z Artifact overlay-official has been successfully uploaded! Final size is 198 bytes. Artifact ID is 8052680083
+pr-server-dryrun	Upload overlay-official artifact	2026-07-02T22:01:38.4961949Z Artifact download URL: https://github.com/cosmogz/Dmonitor-plugin/actions/runs/28624343102/artifacts/8052680083
+pr-server-dryrun	Upload overlay-bitnami artifact	﻿2026-07-02T22:01:38.5101846Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5107235Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5108294Z with:
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5109038Z   name: overlay-bitnami
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5110454Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-bitnami.log
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5112074Z   if-no-files-found: warn
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5113226Z   compression-level: 6
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5114126Z   overwrite: false
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5115066Z   include-hidden-files: false
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.5116074Z ##[endgroup]
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.6817804Z (node:2143) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.6850023Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.6943905Z With the provided path, there will be 1 file uploaded
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.7419559Z Artifact name is valid!
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:38.7422777Z Root directory input is valid!
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.0074779Z Beginning upload of artifact content to blob storage
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.0095045Z (node:2143) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.1375921Z Uploaded bytes 195
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.1685393Z Finished uploading artifact content to blob storage!
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.1700407Z SHA256 digest of uploaded artifact zip is 79e7081514b51614f3533fe4188bdf6098f15aacc511c261496848ddfefa75d0
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.1702790Z Finalizing artifact upload
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.3655083Z Artifact overlay-bitnami.zip successfully finalized. Artifact ID 8052680353
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.3673663Z Artifact overlay-bitnami has been successfully uploaded! Final size is 195 bytes. Artifact ID is 8052680353
+pr-server-dryrun	Upload overlay-bitnami artifact	2026-07-02T22:01:39.3693873Z Artifact download URL: https://github.com/cosmogz/Dmonitor-plugin/actions/runs/28624343102/artifacts/8052680353
+pr-server-dryrun	Upload crd-check artifact	﻿2026-07-02T22:01:39.3868735Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3870314Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3870656Z with:
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3870911Z   name: crd-check
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3871268Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/crd-check.log
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3871714Z   if-no-files-found: warn
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3872051Z   compression-level: 6
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3872816Z   overwrite: false
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3873104Z   include-hidden-files: false
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.3873384Z ##[endgroup]
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.5602626Z (node:2155) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.5604643Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.5704999Z With the provided path, there will be 1 file uploaded
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.5713901Z Artifact name is valid!
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.5714734Z Root directory input is valid!
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.7743047Z Beginning upload of artifact content to blob storage
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.8067295Z (node:2155) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.9410931Z Uploaded bytes 177
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.9855008Z Finished uploading artifact content to blob storage!
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.9874661Z SHA256 digest of uploaded artifact zip is ecfbde97297a9eb9d4b3974dcc0d917bee7518cac33c3c6807b96ecbfb50d387
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:39.9876157Z Finalizing artifact upload
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:40.1974876Z Artifact crd-check.zip successfully finalized. Artifact ID 8052680626
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:40.1976194Z Artifact crd-check has been successfully uploaded! Final size is 177 bytes. Artifact ID is 8052680626
+pr-server-dryrun	Upload crd-check artifact	2026-07-02T22:01:40.1979253Z Artifact download URL: https://github.com/cosmogz/Dmonitor-plugin/actions/runs/28624343102/artifacts/8052680626
+pr-server-dryrun	Upload artifacts (fallback)	﻿2026-07-02T22:01:40.2112941Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2114348Z ##[group]Run actions/upload-artifact@v4
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2114665Z with:
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2114893Z   name: overlay-logs-all
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2115522Z   path: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-*.log
+pr-server-dryrun	Upload artifacts (fallback)	/home/runner/work/Dmonitor-plugin/Dmonitor-plugin/crd-check.log
+pr-server-dryrun	Upload artifacts (fallback)	
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2116200Z   if-no-files-found: warn
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2116473Z   compression-level: 6
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2116748Z   overwrite: false
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2117000Z   include-hidden-files: false
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.2117283Z ##[endgroup]
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.3803870Z (node:2167) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.3805684Z (Use `node --trace-deprecation ...` to show where the warning was created)
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.3954167Z With the provided path, there will be 4 files uploaded
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.3955798Z Artifact name is valid!
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.3956695Z Root directory input is valid!
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.6023190Z Beginning upload of artifact content to blob storage
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.6443956Z (node:2167) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.7609099Z Uploaded bytes 690
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.7985788Z Finished uploading artifact content to blob storage!
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.7987847Z SHA256 digest of uploaded artifact zip is 08c10230cc5a089de2cfcd7e09406b0634fb70fa664eecd943a7780d7d7f2e64
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:40.7989695Z Finalizing artifact upload
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:41.0082825Z Artifact overlay-logs-all.zip successfully finalized. Artifact ID 8052680888
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:41.0088708Z Artifact overlay-logs-all has been successfully uploaded! Final size is 690 bytes. Artifact ID is 8052680888
+pr-server-dryrun	Upload artifacts (fallback)	2026-07-02T22:01:41.0090498Z Artifact download URL: https://github.com/cosmogz/Dmonitor-plugin/actions/runs/28624343102/artifacts/8052680888
+pr-server-dryrun	Post Run actions/checkout@v4	﻿2026-07-02T22:01:41.0269078Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.0270423Z Post job cleanup.
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1231479Z [command]/usr/bin/git version
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1307847Z git version 2.54.0
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1344011Z Temporarily overriding HOME='/home/runner/work/_temp/696c7d0c-b2c5-4b13-acd5-874c09a95265' before making global git config changes
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1345691Z Adding repository directory to the temporary git global config as a safe directory
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1347414Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dmonitor-plugin/Dmonitor-plugin
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1415932Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1525868Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1855597Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1908701Z http.https://github.com/.extraheader
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1911430Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.1996401Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.2403328Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+pr-server-dryrun	Post Run actions/checkout@v4	2026-07-02T22:01:41.2535691Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+pr-server-dryrun	Complete job	﻿2026-07-02T22:01:41.3486778Z Cleaning up orphan processes
+pr-server-dryrun	Complete job	2026-07-02T22:01:41.3735578Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Set up job	﻿2026-07-02T22:01:49.3879405Z Current runner version: '2.335.1'
+Post PR status comment	Set up job	2026-07-02T22:01:49.3905834Z ##[group]Runner Image Provisioner
+Post PR status comment	Set up job	2026-07-02T22:01:49.3907038Z Hosted Compute Agent
+Post PR status comment	Set up job	2026-07-02T22:01:49.3907708Z Version: 20260624.560
+Post PR status comment	Set up job	2026-07-02T22:01:49.3908332Z Commit: 925d229a51159bc391ae97e54a2dd1fe20af789d
+Post PR status comment	Set up job	2026-07-02T22:01:49.3909133Z Build Date: 2026-06-24T18:26:47Z
+Post PR status comment	Set up job	2026-07-02T22:01:49.3909826Z Worker ID: {2036fe8f-07f5-4e30-afe2-330087938580}
+Post PR status comment	Set up job	2026-07-02T22:01:49.3910532Z Azure Region: westus
+Post PR status comment	Set up job	2026-07-02T22:01:49.3911205Z ##[endgroup]
+Post PR status comment	Set up job	2026-07-02T22:01:49.3912676Z ##[group]Operating System
+Post PR status comment	Set up job	2026-07-02T22:01:49.3913401Z Ubuntu
+Post PR status comment	Set up job	2026-07-02T22:01:49.3913950Z 24.04.4
+Post PR status comment	Set up job	2026-07-02T22:01:49.3914464Z LTS
+Post PR status comment	Set up job	2026-07-02T22:01:49.3915062Z ##[endgroup]
+Post PR status comment	Set up job	2026-07-02T22:01:49.3915617Z ##[group]Runner Image
+Post PR status comment	Set up job	2026-07-02T22:01:49.3916214Z Image: ubuntu-24.04
+Post PR status comment	Set up job	2026-07-02T22:01:49.3917065Z Version: 20260628.225.1
+Post PR status comment	Set up job	2026-07-02T22:01:49.3918136Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260628.225/images/ubuntu/Ubuntu2404-Readme.md
+Post PR status comment	Set up job	2026-07-02T22:01:49.3919951Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260628.225
+Post PR status comment	Set up job	2026-07-02T22:01:49.3920887Z ##[endgroup]
+Post PR status comment	Set up job	2026-07-02T22:01:49.3922118Z ##[group]GITHUB_TOKEN Permissions
+Post PR status comment	Set up job	2026-07-02T22:01:49.3924033Z Contents: read
+Post PR status comment	Set up job	2026-07-02T22:01:49.3924794Z Metadata: read
+Post PR status comment	Set up job	2026-07-02T22:01:49.3925366Z Packages: read
+Post PR status comment	Set up job	2026-07-02T22:01:49.3925905Z ##[endgroup]
+Post PR status comment	Set up job	2026-07-02T22:01:49.3928558Z Secret source: Actions
+Post PR status comment	Set up job	2026-07-02T22:01:49.3929349Z Prepare workflow directory
+Post PR status comment	Set up job	2026-07-02T22:01:49.4260091Z Prepare all required actions
+Post PR status comment	Set up job	2026-07-02T22:01:49.4306241Z Getting action download info
+Post PR status comment	Set up job	2026-07-02T22:01:49.8178212Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+Post PR status comment	Set up job	2026-07-02T22:01:50.3433886Z Download action repository 'actions/github-script@v6' (SHA:d7906e4ad0b1822421a7e6a35d5ca353c962f410)
+Post PR status comment	Set up job	2026-07-02T22:01:50.7569553Z Complete job name: Post PR status comment
+Post PR status comment	Download overlay-base log	﻿2026-07-02T22:01:50.8292682Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8301837Z ##[group]Run actions/download-artifact@v4
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8302757Z with:
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8303272Z   name: overlay-base
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8303824Z   path: overlay-logs
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8304377Z   merge-multiple: false
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8304973Z   repository: cosmogz/Dmonitor-plugin
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8305594Z   run-id: 28624343102
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.8306305Z ##[endgroup]
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:50.9955532Z Downloading single artifact
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.0100993Z (node:1930) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.0108178Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.3025265Z Preparing to download the following artifacts:
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.3027447Z - overlay-base (ID: 8052679860, Size: 186, Expected Digest: sha256:b947b4efa46a29104200c64ae0951406deb03a68c7a8327e5c4cb8a437f35186)
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.5859589Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/050f0cc5-8b01-4f7e-8df3-702d1df78b42/workflow-job-run-fbd0d09b-ec37-57ed-b680-25e3c4b7bcbd/artifacts/8d937657bba6bf583441e91c3997d74fb741f2a0458c5bdc8fdb1be8f392bb96.zip
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.5863458Z Starting download of artifact to: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-logs
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.8521591Z (node:1930) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.8523986Z SHA256 digest of downloaded artifact is b947b4efa46a29104200c64ae0951406deb03a68c7a8327e5c4cb8a437f35186
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.8525764Z Artifact download completed successfully.
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.8527315Z Total of 1 artifact(s) downloaded
+Post PR status comment	Download overlay-base log	2026-07-02T22:01:51.8528413Z Download artifact has finished successfully
+Post PR status comment	Download overlay-official log	﻿2026-07-02T22:01:51.8698963Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8702232Z ##[group]Run actions/download-artifact@v4
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8703189Z with:
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8703967Z   name: overlay-official
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8704826Z   path: overlay-logs
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8705679Z   merge-multiple: false
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8706746Z   repository: cosmogz/Dmonitor-plugin
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8707686Z   run-id: 28624343102
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:51.8708508Z ##[endgroup]
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.0291531Z Downloading single artifact
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.0415250Z (node:1942) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.0419342Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.3138505Z Preparing to download the following artifacts:
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.3141065Z - overlay-official (ID: 8052680083, Size: 198, Expected Digest: sha256:f116d49c25a97626107560729ec9c0434c30d2a07f702e4997f8c2aeb185ddd4)
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.5097470Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/050f0cc5-8b01-4f7e-8df3-702d1df78b42/workflow-job-run-fbd0d09b-ec37-57ed-b680-25e3c4b7bcbd/artifacts/d7934f1cbdb0a63b57b982f88fbf2f2fd0a141ae06102cd4ae987fd4646a83f4.zip
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.5107379Z Starting download of artifact to: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-logs
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.8405985Z (node:1942) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.8412352Z SHA256 digest of downloaded artifact is f116d49c25a97626107560729ec9c0434c30d2a07f702e4997f8c2aeb185ddd4
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.8415547Z Artifact download completed successfully.
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.8427690Z Total of 1 artifact(s) downloaded
+Post PR status comment	Download overlay-official log	2026-07-02T22:01:52.8430033Z Download artifact has finished successfully
+Post PR status comment	Download overlay-bitnami log	﻿2026-07-02T22:01:52.8632829Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8637933Z ##[group]Run actions/download-artifact@v4
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8638747Z with:
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8639211Z   name: overlay-bitnami
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8639813Z   path: overlay-logs
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8640401Z   merge-multiple: false
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8641071Z   repository: cosmogz/Dmonitor-plugin
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8641864Z   run-id: 28624343102
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:52.8642407Z ##[endgroup]
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.0190545Z Downloading single artifact
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.0354223Z (node:1954) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.0359417Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.3118197Z Preparing to download the following artifacts:
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.3119782Z - overlay-bitnami (ID: 8052680353, Size: 195, Expected Digest: sha256:79e7081514b51614f3533fe4188bdf6098f15aacc511c261496848ddfefa75d0)
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.5341061Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/050f0cc5-8b01-4f7e-8df3-702d1df78b42/workflow-job-run-fbd0d09b-ec37-57ed-b680-25e3c4b7bcbd/artifacts/cc099e35493b326fad2efe68b95687b966c0cb8eaa8101696b3c297ad1ddadb6.zip
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.5344263Z Starting download of artifact to: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-logs
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.8224388Z (node:1954) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.8278459Z SHA256 digest of downloaded artifact is 79e7081514b51614f3533fe4188bdf6098f15aacc511c261496848ddfefa75d0
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.8282957Z Artifact download completed successfully.
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.8283835Z Total of 1 artifact(s) downloaded
+Post PR status comment	Download overlay-bitnami log	2026-07-02T22:01:53.8284571Z Download artifact has finished successfully
+Post PR status comment	Download crd-check log	﻿2026-07-02T22:01:53.8424841Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8426216Z ##[group]Run actions/download-artifact@v4
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8426832Z with:
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8427048Z   name: crd-check
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8427273Z   path: overlay-logs
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8427513Z   merge-multiple: false
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8427782Z   repository: cosmogz/Dmonitor-plugin
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8428076Z   run-id: 28624343102
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.8428313Z ##[endgroup]
+Post PR status comment	Download crd-check log	2026-07-02T22:01:53.9960600Z Downloading single artifact
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.0163555Z (node:1969) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.0165298Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.2949028Z Preparing to download the following artifacts:
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.2950684Z - crd-check (ID: 8052680626, Size: 177, Expected Digest: sha256:ecfbde97297a9eb9d4b3974dcc0d917bee7518cac33c3c6807b96ecbfb50d387)
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.5154797Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/050f0cc5-8b01-4f7e-8df3-702d1df78b42/workflow-job-run-fbd0d09b-ec37-57ed-b680-25e3c4b7bcbd/artifacts/4356baa292f6c57a295618eb86b00b843708802613e2110b13fd1c2f7cdaea69.zip
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.5158544Z Starting download of artifact to: /home/runner/work/Dmonitor-plugin/Dmonitor-plugin/overlay-logs
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.8033473Z (node:1969) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.8080169Z SHA256 digest of downloaded artifact is ecfbde97297a9eb9d4b3974dcc0d917bee7518cac33c3c6807b96ecbfb50d387
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.8081779Z Artifact download completed successfully.
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.8082701Z Total of 1 artifact(s) downloaded
+Post PR status comment	Download crd-check log	2026-07-02T22:01:54.8087989Z Download artifact has finished successfully
+Post PR status comment	Post summary comment to PR	﻿2026-07-02T22:01:54.8287467Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8288876Z ##[group]Run actions/github-script@v6
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8289176Z with:
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8291989Z   github-token: ***
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8304121Z   script: const pr = context.payload.pull_request;
+Post PR status comment	Post summary comment to PR	if (!pr) {
+Post PR status comment	Post summary comment to PR	  console.log('No pull request context; skipping comment');
+Post PR status comment	Post summary comment to PR	  return;
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	// Determine the server dry-run job result via the Actions API (needs is not available here)
+Post PR status comment	Post summary comment to PR	let result = 'unknown';
+Post PR status comment	Post summary comment to PR	try {
+Post PR status comment	Post summary comment to PR	  const { data: jobsResp } = await github.rest.actions.listJobsForWorkflowRun({
+Post PR status comment	Post summary comment to PR	    owner: context.repo.owner,
+Post PR status comment	Post summary comment to PR	    repo: context.repo.repo,
+Post PR status comment	Post summary comment to PR	    run_id: context.runId,
+Post PR status comment	Post summary comment to PR	  });
+Post PR status comment	Post summary comment to PR	  const job = (jobsResp && jobsResp.jobs) ? jobsResp.jobs.find(j => j.name === 'pr-server-dryrun') : undefined;
+Post PR status comment	Post summary comment to PR	  if (job && job.conclusion) result = job.conclusion;
+Post PR status comment	Post summary comment to PR	} catch (e) {
+Post PR status comment	Post summary comment to PR	  console.log('Could not determine job result:', e.message || e);
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	const conclusion = (result === 'success') ? 'succeeded' : 'failed or had issues';
+Post PR status comment	Post summary comment to PR	const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+Post PR status comment	Post summary comment to PR	const fs = require('fs');
+Post PR status comment	Post summary comment to PR	const path = require('path');
+Post PR status comment	Post summary comment to PR	const logsDir = 'overlay-logs';
+Post PR status comment	Post summary comment to PR	let aggregated = '';
+Post PR status comment	Post summary comment to PR	try {
+Post PR status comment	Post summary comment to PR	  const files = fs.readdirSync(logsDir).filter(f => f.endsWith('.log'));
+Post PR status comment	Post summary comment to PR	  files.forEach(f => {
+Post PR status comment	Post summary comment to PR	    const content = fs.readFileSync(path.join(logsDir, f), 'utf8');
+Post PR status comment	Post summary comment to PR	    aggregated += `\n--- ${f} ---\n` + content + '\n';
+Post PR status comment	Post summary comment to PR	  });
+Post PR status comment	Post summary comment to PR	} catch (e) {
+Post PR status comment	Post summary comment to PR	  aggregated = 'No logs available.';
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	const maxLen = 60000;
+Post PR status comment	Post summary comment to PR	let truncated = false;
+Post PR status comment	Post summary comment to PR	let log = aggregated;
+Post PR status comment	Post summary comment to PR	if (log.length > maxLen) {
+Post PR status comment	Post summary comment to PR	  log = log.slice(0, maxLen);
+Post PR status comment	Post summary comment to PR	  truncated = true;
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	let body = `**Grafana overlay server-side dry-run ${conclusion}**\n\nWorkflow run: ${runUrl}\n\n`;
+Post PR status comment	Post summary comment to PR	body += '```\n' + log + '\n```';
+Post PR status comment	Post summary comment to PR	if (truncated) {
+Post PR status comment	Post summary comment to PR	  body += '\n\n*Log truncated - see full run artifacts for complete logs.*';
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	
+Post PR status comment	Post summary comment to PR	// Attach artifact links (if available) for quick download
+Post PR status comment	Post summary comment to PR	try {
+Post PR status comment	Post summary comment to PR	  const { data: artResp } = await github.rest.actions.listWorkflowRunArtifacts({
+Post PR status comment	Post summary comment to PR	    owner: context.repo.owner,
+Post PR status comment	Post summary comment to PR	    repo: context.repo.repo,
+Post PR status comment	Post summary comment to PR	    run_id: context.runId,
+Post PR status comment	Post summary comment to PR	  });
+Post PR status comment	Post summary comment to PR	  const artifacts = (artResp && artResp.artifacts) ? artResp.artifacts : [];
+Post PR status comment	Post summary comment to PR	  if (artifacts.length > 0) {
+Post PR status comment	Post summary comment to PR	    // group artifacts by expected names
+Post PR status comment	Post summary comment to PR	    const groups = { base: [], official: [], bitnami: [], other: [] };
+Post PR status comment	Post summary comment to PR	    for (const a of artifacts) {
+Post PR status comment	Post summary comment to PR	      if (a.name.includes('overlay-base')) groups.base.push(a);
+Post PR status comment	Post summary comment to PR	      else if (a.name.includes('overlay-official')) groups.official.push(a);
+Post PR status comment	Post summary comment to PR	      else if (a.name.includes('overlay-bitnami')) groups.bitnami.push(a);
+Post PR status comment	Post summary comment to PR	      else groups.other.push(a);
+Post PR status comment	Post summary comment to PR	    }
+Post PR status comment	Post summary comment to PR	    body += '\n\n**Artifacts**:\n';
+Post PR status comment	Post summary comment to PR	    const makeList = (arr) => arr.map(a => `- [${a.name}](${a.archive_download_url || `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`})`).join('\n');
+Post PR status comment	Post summary comment to PR	    if (groups.base.length) body += '\n**Base overlay**:\n' + makeList(groups.base) + '\n';
+Post PR status comment	Post summary comment to PR	    if (groups.official.length) body += '\n**Official overlay**:\n' + makeList(groups.official) + '\n';
+Post PR status comment	Post summary comment to PR	    if (groups.bitnami.length) body += '\n**Bitnami overlay**:\n' + makeList(groups.bitnami) + '\n';
+Post PR status comment	Post summary comment to PR	    if (groups.other.length) body += '\n**Other artifacts**:\n' + makeList(groups.other) + '\n';
+Post PR status comment	Post summary comment to PR	  }
+Post PR status comment	Post summary comment to PR	} catch (e) {
+Post PR status comment	Post summary comment to PR	  console.log('Could not list artifacts:', e.message || e);
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	
+Post PR status comment	Post summary comment to PR	// Try to find an existing bot comment and update it, otherwise create
+Post PR status comment	Post summary comment to PR	const { data: comments } = await github.rest.issues.listComments({
+Post PR status comment	Post summary comment to PR	  owner: context.repo.owner,
+Post PR status comment	Post summary comment to PR	  repo: context.repo.repo,
+Post PR status comment	Post summary comment to PR	  issue_number: pr.number,
+Post PR status comment	Post summary comment to PR	});
+Post PR status comment	Post summary comment to PR	const botComment = comments.find(c => c.user && c.user.type === 'Bot' && c.body && c.body.includes('Grafana overlay server-side dry-run'));
+Post PR status comment	Post summary comment to PR	if (botComment) {
+Post PR status comment	Post summary comment to PR	  await github.rest.issues.updateComment({
+Post PR status comment	Post summary comment to PR	    owner: context.repo.owner,
+Post PR status comment	Post summary comment to PR	    repo: context.repo.repo,
+Post PR status comment	Post summary comment to PR	    comment_id: botComment.id,
+Post PR status comment	Post summary comment to PR	    body,
+Post PR status comment	Post summary comment to PR	  });
+Post PR status comment	Post summary comment to PR	} else {
+Post PR status comment	Post summary comment to PR	  await github.rest.issues.createComment({
+Post PR status comment	Post summary comment to PR	    owner: context.repo.owner,
+Post PR status comment	Post summary comment to PR	    repo: context.repo.repo,
+Post PR status comment	Post summary comment to PR	    issue_number: pr.number,
+Post PR status comment	Post summary comment to PR	    body,
+Post PR status comment	Post summary comment to PR	  });
+Post PR status comment	Post summary comment to PR	}
+Post PR status comment	Post summary comment to PR	
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8317137Z   debug: false
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8317407Z   user-agent: actions/github-script
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8317704Z   result-encoding: json
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8317961Z   retries: 0
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8318215Z   retry-exempt-status-codes: 400,401,403,404,422
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.8318547Z ##[endgroup]
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.9027510Z (node:1982) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.9029401Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:54.9151846Z (node:1982) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.2252646Z Could not determine job result: Resource not accessible by integration
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.4111233Z Could not list artifacts: Resource not accessible by integration
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6805246Z RequestError [HttpError]: Resource not accessible by integration
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6814536Z     at /home/runner/work/_actions/actions/github-script/v6/dist/index.js:6842:21
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6816623Z     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6842956Z ##[error]Unhandled error: HttpError: Resource not accessible by integration
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6856880Z     at async eval (eval at callAsyncFunction (/home/runner/work/_actions/actions/github-script/v6/dist/index.js:15143:16), <anonymous>:78:28)
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6858608Z     at async main (/home/runner/work/_actions/actions/github-script/v6/dist/index.js:15236:20) {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6859941Z   status: 403,
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6860623Z   response: {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6861729Z     url: 'https://api.github.com/repos/cosmogz/Dmonitor-plugin/issues/1/comments',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6862739Z     status: 403,
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6863593Z     headers: {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6864256Z       'access-control-allow-origin': '*',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6870583Z       'access-control-expose-headers': 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset, Warning',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6873370Z       'content-encoding': 'gzip',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6874537Z       'content-security-policy': "default-src 'none'",
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6875438Z       'content-type': 'application/json; charset=utf-8',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6877132Z       date: 'Thu, 02 Jul 2026 22:01:55 GMT',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6887375Z       'referrer-policy': 'origin-when-cross-origin, strict-origin-when-cross-origin',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6890963Z       server: 'github.com',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6891722Z       'strict-transport-security': 'max-age=31536000; includeSubdomains; preload',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6892626Z       'transfer-encoding': 'chunked',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6893198Z       vary: 'Accept-Encoding, Accept, X-Requested-With',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6893677Z       'x-accepted-github-permissions': 'issues=read; pull_requests=read',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6894129Z       'x-content-type-options': 'nosniff',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6894452Z       'x-frame-options': 'deny',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6894797Z       'x-github-api-version-selected': '2022-11-28',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6895187Z       'x-github-media-type': 'github.v3; format=json',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6895604Z       'x-github-request-id': 'CFC0:39F097:8AB461:8CEC97:6A46DFD3',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6895979Z       'x-ratelimit-limit': '5000',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6896276Z       'x-ratelimit-remaining': '4996',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6896856Z       'x-ratelimit-reset': '1783032851',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6897409Z       'x-ratelimit-resource': 'core',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6897721Z       'x-ratelimit-used': '4',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6898102Z       'x-xss-protection': '0'
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6898384Z     },
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6898587Z     data: {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6898860Z       message: 'Resource not accessible by integration',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6899388Z       documentation_url: 'https://docs.github.com/rest/issues/comments#list-issue-comments',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6899872Z       status: '403'
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6900102Z     }
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6900296Z   },
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6900499Z   request: {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6900711Z     method: 'GET',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6901091Z     url: 'https://api.github.com/repos/cosmogz/Dmonitor-plugin/issues/1/comments',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6901515Z     headers: {
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6901778Z       accept: 'application/vnd.github.v3+json',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6902209Z       'user-agent': 'actions/github-script octokit-core.js/3.6.0 Node.js/24',
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6902640Z       authorization: 'bearer [REDACTED]'
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6903074Z     },
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6903380Z     request: { agent: [Agent], hook: [Function: bound bound register] }
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6903751Z   }
+Post PR status comment	Post summary comment to PR	2026-07-02T22:01:55.6903943Z }
+Post PR status comment	Complete job	﻿2026-07-02T22:01:55.6989693Z Cleaning up orphan processes
+Post PR status comment	Complete job	2026-07-02T22:01:55.7249165Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/download-artifact@v4, actions/github-script@v6. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,117 @@
+replicaCount: 2
+
+image:
+  repository: cosmogz/dmonitor
+  tag: latest
+  pullPolicy: IfNotPresent
+  imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 3000
+
+metrics:
+  path: /metrics
+  port: http
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+probes:
+  liveness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readiness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# ServiceAccount
+serviceAccount:
+  create: false
+  name: ""
+
+# OIDC / OAuth configuration (for Grafana or app auth)
+oidc:
+  enabled: false
+  provider: "generic"
+  issuerUrl: ""
+  clientID: ""
+  clientSecret:
+    create: false
+    secretName: ""
+    secretKey: "client-secret"
+  redirectURI: ""
+  scopes:
+    - openid
+    - profile
+    - email
+  tlsSkipVerify: false
+
+# Grafana provisioning (provisioning by configmaps)
+provisioning:
+  enabled: false
+  providerConfig: |-
+    apiVersion: 1
+    providers: []
+  dashboards: {}
+
+# ExternalSecrets integration (ExternalSecrets operator required)
+externalSecrets:
+  enabled: false
+  secretStoreName: "my-secret-store"
+  secretStoreKind: "SecretStore"
+  createExternalSecret: false
+  remoteKeyPrefix: "dmonitor/"
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  # target CPU utilization percentage for autoscaling (v2 uses metrics; this is a simple default)
+  targetCPUUtilizationPercentage: 50
+  # target memory utilization percentage (optional)
+  targetMemoryUtilizationPercentage: 0
+  # customMetrics: list of additional HPA metric blocks to include (each entry rendered verbatim)
+  # Example:
+  # customMetrics:
+  #   - type: Pods
+  #     pods:
+  #       metric:
+  #         name: some_custom_metric
+  #       target:
+  #         type: AverageValue
+  #         averageValue: 100
+  customMetrics: []
+
+# Ingress
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
