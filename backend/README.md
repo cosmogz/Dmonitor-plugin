@@ -1,3 +1,37 @@
+# Dmonitor backend — Local dev & tests
+
+Quick steps to run the backend and integration test locally.
+
+Start Postgres and Redis (Docker):
+
+```bash
+docker run --name dmonitor-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=dmonitor -p 5432:5432 -d postgres:15
+docker run --name dmonitor-redis -p 6379:6379 -d redis:7-alpine
+```
+
+Install dependencies and run migrations:
+
+```bash
+cd backend
+npm install
+export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/dmonitor
+node scripts/migrate.js
+```
+
+Start server and worker (dev):
+
+```bash
+PORT=4002 NODE_ENV=development node src/index.js &
+npm run worker:openmrs &
+```
+
+Run the integration test (requires Postgres + Redis running):
+
+```bash
+npm run test:integration
+```
+
+If you want CI to run integration tests on PRs, see `.github/workflows/backend-integration.yml`.
 # Dmonitor backend
 
 Minimal Node/Express backend scaffold for Dmonitor.
