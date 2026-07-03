@@ -1,0 +1,65 @@
+name: Extra CI checks
+
+on:
+  pull_request:
+    paths:
+      - 'manifests/**'
+      - 'charts/**'
+      - 'package.json'
+      - 'src/**'
+
+jobs:
+  security-and-manifests:
+    name: Security + Manifests validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: NPM audit (fail on high)
+        run: |
+          set -e
+          npm audit --audit-level=high
+
+      - name: Install kubectl
+        run: |
+          set -e
+          KUBECTL_VERSION=v1.26.0
+          curl -fsSL -o kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+
+      - name: Validate kustomize overlays with client-side dry-run
+        run: |
+          set -e
+          OVERLAYS=(
+            manifests/grafana/overlay
+            manifests/grafana/overlay/examples/official
+            manifests/grafana/overlay/examples/bitnami
+          )
+          for overlay in "${OVERLAYS[@]}"; do
+            if [ -d "$overlay" ]; then
+              echo "Validating overlay: $overlay"
+              if kubectl kustomize "$overlay" | kubectl apply --dry-run=client -f -; then
+                echo "Overlay $overlay validated"
+              else
+                echo "Overlay $overlay validation FAILED"; exit 1
+              fi
+            else
+              echo "Skipping missing overlay: $overlay"
+            fi
+          done
+
+      - name: Helm lint (charts)
+        run: |
+          set -e
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm lint charts/dmonitor || true
