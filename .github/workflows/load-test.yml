@@ -1,0 +1,16 @@
+name: Load Test (k6)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.STAGING_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install k6
+        run: sudo apt-get update && sudo apt-get install -y gnupg2 ca-certificates && curl -s https://dl.k6.io/key.gpg | sudo apt-key add - && echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list && sudo apt-get update && sudo apt-get install -y k6
+      - name: Run k6 script
+        run: |
+          k6 run --env TARGET_URL=${{ secrets.STAGING_URL }} load/k6/script.js

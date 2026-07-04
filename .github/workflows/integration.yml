@@ -1,6 +1,63 @@
 name: Integration Tests
 
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dmonitor
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=5s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: |
+          cd backend
+          npm ci
+      - name: Wait for Postgres
+        run: |
+          for i in {1..15}; do pg_isready -h localhost -p 5432 -U postgres && break || sleep 1; done
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dmonitor
+        run: |
+          cd backend
+          node scripts/migrate.js
+      - name: Start backend and workers
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dmonitor
+          REDIS_URL: redis://localhost:6379
+        run: |
+          cd backend
+          node src/index.js &
+          sleep 2
+          node src/sync/processor.js &
+          sleep 2
+          npm test __tests__/integration.sync.idempotency.test.js -- --runInBand
+name: Integration Tests
+
+on:
   workflow_dispatch:
   push:
     branches: [ main ]
