@@ -6,15 +6,26 @@ on:
 jobs:
   run-migrations-and-smoke:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dmonitor
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U postgres
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Postgres
-        uses: harmonicsh/postgresql-action@v1
-        with:
-          postgresql-version: '15'
-          postgres-user: postgres
-          postgres-password: postgres
-          postgres-db: dmonitor
+      - name: Wait for Postgres
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          until pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done
 
       - name: Install Node
         uses: actions/setup-node@v4
