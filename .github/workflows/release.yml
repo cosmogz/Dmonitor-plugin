@@ -1,0 +1,91 @@
+name: Release: Build image, SBOM, Scan, Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tag
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "IMAGE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=release-${GITHUB_RUN_ID}" >> $GITHUB_ENV
+          fi
+
+      - name: Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
+            ghcr.io/${{ github.repository_owner }}/dmonitor-backend:latest
+
+      - name: Install Syft and generate SBOM for image
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          syft ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }} -o cyclonedx-json > sbom-image-${{ env.IMAGE_TAG }}.json
+
+      - name: Upload SBOM (image)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-image-${{ env.IMAGE_TAG }}
+          path: sbom-image-${{ env.IMAGE_TAG }}.json
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@v1
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Package Helm chart
+        run: |
+          helm dependency update charts/dmonitor || true
+          helm package charts/dmonitor -d packaged-charts
+
+      - name: Create release and upload chart via Chart Releaser
+        uses: helm/chart-releaser-action@v1
+        with:
+          charts_dir: packaged-charts
+          charts_repo_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SBOM (source)
+        run: |
+          syft dir:./backend -o cyclonedx-json > sbom-source-${{ env.IMAGE_TAG }}.json || true
+        continue-on-error: true
+
+      - name: Upload SBOM artifact (source)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-source-${{ env.IMAGE_TAG }}
+          path: sbom-source-${{ env.IMAGE_TAG }}.json
