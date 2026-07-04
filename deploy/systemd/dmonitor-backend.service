@@ -1,0 +1,14 @@
+[Unit]
+Description=Dmonitor Backend
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/dmonitor/.env
+WorkingDirectory=/opt/dmonitor
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+User=dmonitor
+Group=dmonitor
+
+[Install]
+WantedBy=multi-user.target

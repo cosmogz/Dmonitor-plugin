@@ -20,10 +20,19 @@ async function processBatch(batchId) {
       const existsQ = 'SELECT 1 FROM readings WHERE patient_id=$1 AND recorded_at=$2 AND value=$3 LIMIT 1';
       const ex = await db.query(existsQ, [patientId, recordedAt, value]);
       if (ex.rowCount > 0) continue; // skip duplicate
-      const insQ = 'INSERT INTO readings (patient_id, value, unit, recorded_at, metadata) VALUES ($1,$2,$3,$4,$5) RETURNING id';
-      const insParams = [patientId, value, r.unit || null, recordedAt, JSON.stringify(r.metadata || {})];
-      const ir = await db.query(insQ, insParams);
-      if (ir.rows && ir.rows[0]) created.push(ir.rows[0].id);
+
+      // support client-provided idempotency key
+      const clientId = r.client_id || payload.client_id || null;
+      const insQ = 'INSERT INTO readings (patient_id, value, unit, recorded_at, metadata, client_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id';
+      const insParams = [patientId, value, r.unit || null, recordedAt, JSON.stringify(r.metadata || {}), clientId];
+      try {
+        const ir = await db.query(insQ, insParams);
+        if (ir.rows && ir.rows[0]) created.push(ir.rows[0].id);
+      } catch (e) {
+        // unique constraint (dedupe) - skip
+        if (e && e.code === '23505') continue;
+        throw e;
+      }
     }
 
     // mark batch processed

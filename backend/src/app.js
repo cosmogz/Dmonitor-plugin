@@ -18,8 +18,23 @@ if (process.env.OTEL_ENABLED === 'true') {
   try {
     const { NodeSDK } = require('@opentelemetry/sdk-node');
     const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+    let traceExporter;
+    if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+      try {
+        // prefer http exporter; fall back quietly if not installed
+        const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+        traceExporter = new OTLPTraceExporter({ url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT });
+      } catch (e) {
+        try {
+          const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
+          traceExporter = new OTLPTraceExporter({ url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT });
+        } catch (e2) {
+          console.warn('OTLP exporter not available; tracing disabled');
+        }
+      }
+    }
     const sdk = new NodeSDK({
-      traceExporter: undefined,
+      traceExporter,
       instrumentations: [getNodeAutoInstrumentations()],
     });
     sdk.start().then(() => console.log('OpenTelemetry started')).catch(() => {});
