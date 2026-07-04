@@ -50,7 +50,20 @@ async function evaluateAndCreateAlert(patientId, readingId, reading) {
     return alertId;
 }
 
-module.exports = { evaluateAndCreateAlert, classifyGlucose };
+async function createAlert(patientId, type, severity, message, metadata = {}) {
+  const meta = Object.assign({}, metadata, { created_by: 'alerts-engine' });
+  const q = `INSERT INTO alerts (patient_id, severity, type, message, metadata) VALUES ($1,$2,$3,$4,$5) RETURNING id`;
+  const params = [patientId, severity, type, message, JSON.stringify(meta)];
+  const res = await db.query(q, params);
+  const alertId = res.rows && res.rows[0] ? res.rows[0].id : null;
+  if (alertId) {
+    try { alertsCreated.inc({ severity: severity || 'unknown', type: type || 'unknown' }, 1); } catch (e) {}
+    try { await _enqueueNotifications(alertId, patientId, { severity, type, message }); } catch (e) { console.error('failed to create/enqueue notification', e.message || e); }
+  }
+  return alertId;
+}
+
+module.exports = { evaluateAndCreateAlert, classifyGlucose, createAlert };
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 

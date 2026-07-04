@@ -4,6 +4,7 @@ const db = require('../db');
 const router = express.Router();
 
 const { computeTrends } = require('../analytics/trends');
+const { evaluateAndAlertCompliance, computeCompliance } = require('../analytics/compliance');
 
 // Lookup patient by external mapping
 router.get('/lookup', async (req, res) => {
@@ -100,6 +101,21 @@ router.get('/:id/trends', async (req, res) => {
     res.json({ trends: t });
   } catch (err) {
     console.error('patient trends error', err.message || err);
+    res.status(500).json({ error: 'internal error' });
+  }
+});
+
+// Compliance summary and evaluation
+router.get('/:id/compliance', async (req, res) => {
+  const patientId = Number(req.params.id);
+  if (!patientId) return res.status(400).json({ error: 'invalid patient id' });
+  const windowDays = Math.min(Math.max(Number(req.query.windowDays) || 7, 1), 90);
+  try {
+    // evaluateAndAlertCompliance will create alerts if needed and return details
+    const result = await evaluateAndAlertCompliance(patientId, { windowDays });
+    res.json(result);
+  } catch (err) {
+    console.error('patient compliance error', err.message || err);
     res.status(500).json({ error: 'internal error' });
   }
 });
