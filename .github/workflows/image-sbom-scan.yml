@@ -1,0 +1,69 @@
+name: Image Build, SBOM & Trivy Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract short SHA tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
+
+      - name: Build image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
+
+      - name: Install Syft and generate SBOM
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          syft ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }} -o cyclonedx-json > sbom-${{ env.IMAGE_TAG }}.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ env.IMAGE_TAG }}
+          path: sbom-${{ env.IMAGE_TAG }}.json
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@v1
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push image to GHCR (if available)
+        if: ${{ secrets.GITHUB_TOKEN != '' }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
