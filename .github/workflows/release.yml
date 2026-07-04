@@ -46,11 +46,25 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }}
             ghcr.io/${{ github.repository_owner }}/dmonitor-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Install Syft and generate SBOM for image
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
           syft ghcr.io/${{ github.repository_owner }}/dmonitor-backend:${{ env.IMAGE_TAG }} -o cyclonedx-json > sbom-image-${{ env.IMAGE_TAG }}.json
+
+      - name: Install Grype and scan SBOM
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          grype sbom-image-${{ env.IMAGE_TAG }}.json --fail-on high || (grype sbom-image-${{ env.IMAGE_TAG }}.json -o json > grype-image-${{ env.IMAGE_TAG }}.json && exit 1)
+
+      - name: Upload Grype report (image)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grype-image-${{ env.IMAGE_TAG }}
+          path: grype-image-${{ env.IMAGE_TAG }}.json
 
       - name: Upload SBOM (image)
         uses: actions/upload-artifact@v4
