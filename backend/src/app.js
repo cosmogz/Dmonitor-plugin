@@ -70,6 +70,10 @@ app.use('/api/v1/readings', readings);
 const patients = require('./routes/patients');
 app.use('/api/v1/patients', patients);
 
+// Sync (offline/batch ingestion)
+const sync = require('./routes/sync');
+app.use('/api/v1/sync', sync);
+
 // Alerts endpoint
 const alerts = require('./routes/alerts');
 app.use('/api/v1/alerts', alerts);
