@@ -1,0 +1,12 @@
+{
+  "annotations": {"list": []},
+  "panels": [
+    {
+      "type": "graph",
+      "title": "HTTP Requests",
+      "targets": []
+    }
+  ],
+  "title": "Dmonitor Overview",
+  "schemaVersion": 16
+}

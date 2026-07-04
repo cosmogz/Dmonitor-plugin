@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmonitor-backend
+  labels:
+    app: dmonitor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dmonitor
+  template:
+    metadata:
+      labels:
+        app: dmonitor
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/{{REPO_OWNER}}/dmonitor-backend:latest
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: JWT_SECRET
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5

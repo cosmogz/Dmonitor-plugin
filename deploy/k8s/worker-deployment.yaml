@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dmonitor-workers
+  labels:
+    app: dmonitor-workers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dmonitor-workers
+  template:
+    metadata:
+      labels:
+        app: dmonitor-workers
+    spec:
+      containers:
+        - name: sync-worker
+          image: ghcr.io/{{REPO_OWNER}}/dmonitor-backend:latest
+          command: ["node", "src/sync/processor.js"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: REDIS_URL
+        - name: notifications-worker
+          image: ghcr.io/{{REPO_OWNER}}/dmonitor-backend:latest
+          command: ["node", "src/notifications/worker.js"]
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dmonitor-secrets
+                  key: REDIS_URL

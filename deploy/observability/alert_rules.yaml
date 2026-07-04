@@ -1,0 +1,10 @@
+groups:
+  - name: dmonitor.rules
+    rules:
+      - alert: HighQueueLength
+        expr: redis_total_commands_processed_seconds_count > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Redis command rate"
