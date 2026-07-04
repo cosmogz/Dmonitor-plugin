@@ -41,7 +41,7 @@
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.36.0"
   },
   "optionalDependencies": {
-    "twilio": "^4.0.0"
+    "twilio": "^6.0.2"
   },
   "devDependencies": {
     "jest": "^29.6.4",
