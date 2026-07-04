@@ -1,0 +1,35 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    paths:
+      - 'charts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      - name: Package Helm chart
+        run: |
+          helm dependency update charts/dmonitor || true
+          helm package charts/dmonitor -d packaged-charts
+
+      - name: Create release and upload chart (Chart Releaser)
+        uses: helm/chart-releaser-action@v1
+        with:
+          charts_dir: packaged-charts
+          charts_repo_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
