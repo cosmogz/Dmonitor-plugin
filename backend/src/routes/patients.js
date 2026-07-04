@@ -3,6 +3,8 @@ const db = require('../db');
 
 const router = express.Router();
 
+const { computeTrends } = require('../analytics/trends');
+
 // Lookup patient by external mapping
 router.get('/lookup', async (req, res) => {
   const { external_system, external_id } = req.query;
@@ -84,6 +86,20 @@ router.get('/:id/alerts', async (req, res) => {
     res.json({ alerts: r.rows, limit, offset });
   } catch (err) {
     console.error('patient alerts error', err.message || err);
+    res.status(500).json({ error: 'internal error' });
+  }
+});
+
+// Trends for a patient (rolling stats)
+router.get('/:id/trends', async (req, res) => {
+  const patientId = Number(req.params.id);
+  if (!patientId) return res.status(400).json({ error: 'invalid patient id' });
+  const windowHours = Math.min(Math.max(Number(req.query.windowHours) || 24, 1), 168);
+  try {
+    const t = await computeTrends(patientId, { windowHours });
+    res.json({ trends: t });
+  } catch (err) {
+    console.error('patient trends error', err.message || err);
     res.status(500).json({ error: 'internal error' });
   }
 });
