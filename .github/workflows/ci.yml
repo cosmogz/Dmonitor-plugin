@@ -106,3 +106,38 @@ jobs:
         run: npm run lint || true
       - name: Run tests
         run: npm test
+
+  otel-smoke:
+    runs-on: ubuntu-latest
+    needs: test
+    services:
+      otelcol:
+        image: otel/opentelemetry-collector-contrib:0.70.0
+        ports:
+          - 4318:4318
+        options: >-
+          --health-cmd='curl -sSf http://localhost:4318/metrics || exit 1' --health-interval=5s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Cache backend npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('backend/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+      - name: Run OTEL smoke test
+        env:
+          OTEL_ENABLED: 'true'
+          OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:4318/v1/traces'
+        run: |
+          cd backend
+          npm run otel:smoke

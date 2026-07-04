@@ -17,6 +17,9 @@
     "worker:notifications": "node src/notifications/worker.js",
     "workers": "node src/openmrs/worker.js & node src/notifications/worker.js & node src/sync/processor.js"
   },
+  "scripts": {
+    "otel:smoke": "node scripts/otel_smoke.js"
+  },
   "dependencies": {
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
