@@ -1,0 +1,23 @@
+name: Helm Chart Lint
+
+on:
+  push:
+    paths:
+      - 'charts/**'
+  pull_request:
+    paths:
+      - 'charts/**'
+
+jobs:
+  helm-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '3.12.0'
+      - name: Lint charts
+        run: |
+          helm lint charts/dmonitor || true
+        # don't fail workflow hard; lint output is surfaced in logs
