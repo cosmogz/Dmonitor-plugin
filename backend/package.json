@@ -18,6 +18,18 @@
     "workers": "node src/openmrs/worker.js & node src/notifications/worker.js & node src/sync/processor.js"
   },
   "scripts": {
+    "start": "node src/index.js",
+    "dev": "NODE_ENV=development nodemon --watch src --exec node src/index.js",
+    "migrate": "node scripts/migrate.js",
+    "migrate:down": "echo 'manual rollback required'",
+    "lint": "echo 'no lint configured'",
+    "worker:openmrs": "node src/openmrs/worker.js",
+    "test": "jest",
+    "test:integration": "jest __tests__/integration.openmrs.test.js --runInBand",
+    "worker:notifications": "node src/notifications/worker.js",
+    "worker:sync": "node src/sync/processor.js",
+    "worker:notifications": "node src/notifications/worker.js",
+    "workers": "node src/openmrs/worker.js & node src/notifications/worker.js & node src/sync/processor.js",
     "otel:smoke": "node scripts/otel_smoke.js"
   },
   "dependencies": {

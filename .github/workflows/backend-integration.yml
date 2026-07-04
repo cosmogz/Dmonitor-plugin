@@ -50,10 +50,11 @@ jobs:
       - name: Post PR comment on success
         if: ${{ success() && github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
+        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr = context.payload.pull_request;
             if (!pr) return;
             const body = `✅ Backend integration tests passed for this PR. Artifacts: none.`;
-            await github.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body });
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body });
