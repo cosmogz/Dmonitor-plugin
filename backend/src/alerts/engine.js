@@ -16,10 +16,16 @@ const alertsCreated = new promClient.Counter({
 function classifyGlucose(value) {
   if (value == null || Number.isNaN(Number(value))) return null;
   const v = Number(value);
-  if (v < 54) return { severity: 'critical', type: 'severe_hypoglycemia', message: `Glucose critically low: ${v} mg/dL` };
-  if (v >= 54 && v < 70) return { severity: 'warning', type: 'hypoglycemia', message: `Glucose low: ${v} mg/dL` };
-  if (v > 300) return { severity: 'critical', type: 'critical_hyperglycemia', message: `Glucose critically high: ${v} mg/dL` };
-  if (v > 180) return { severity: 'warning', type: 'hyperglycemia', message: `Glucose high: ${v} mg/dL` };
+  // allow overrides via env vars
+  const LOW_CRIT = Number(process.env.ALERT_LOW_CRIT || 54);
+  const LOW_WARN = Number(process.env.ALERT_LOW_WARN || 70);
+  const HIGH_WARN = Number(process.env.ALERT_HIGH_WARN || 180);
+  const HIGH_CRIT = Number(process.env.ALERT_HIGH_CRIT || 300);
+
+  if (v < LOW_CRIT) return { severity: 'critical', type: 'severe_hypoglycemia', message: `Glucose critically low: ${v} mg/dL` };
+  if (v >= LOW_CRIT && v < LOW_WARN) return { severity: 'warning', type: 'hypoglycemia', message: `Glucose low: ${v} mg/dL` };
+  if (v > HIGH_CRIT) return { severity: 'critical', type: 'critical_hyperglycemia', message: `Glucose critically high: ${v} mg/dL` };
+  if (v > HIGH_WARN) return { severity: 'warning', type: 'hyperglycemia', message: `Glucose high: ${v} mg/dL` };
   return null;
 }
 

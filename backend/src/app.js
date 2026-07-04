@@ -13,6 +13,21 @@ const db = require('./db');
 
 const app = express();
 
+// Optional OpenTelemetry initialization (no-op if not configured)
+if (process.env.OTEL_ENABLED === 'true') {
+  try {
+    const { NodeSDK } = require('@opentelemetry/sdk-node');
+    const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+    const sdk = new NodeSDK({
+      traceExporter: undefined,
+      instrumentations: [getNodeAutoInstrumentations()],
+    });
+    sdk.start().then(() => console.log('OpenTelemetry started')).catch(() => {});
+  } catch (e) {
+    console.warn('OpenTelemetry not initialized (missing packages or misconfigured)');
+  }
+}
+
 // Prometheus metrics
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 collectDefaultMetrics({ timeout: 5000 });
@@ -73,6 +88,10 @@ app.use('/api/v1/patients', patients);
 // Sync (offline/batch ingestion)
 const sync = require('./routes/sync');
 app.use('/api/v1/sync', sync);
+
+// Tenants (admin)
+const tenants = require('./routes/tenants');
+app.use('/api/v1/tenants', tenants);
 
 // Alerts endpoint
 const alerts = require('./routes/alerts');

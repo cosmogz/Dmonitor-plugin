@@ -40,7 +40,18 @@ async function computeTrends(patientId, opts = {}) {
     if (gapMinutes > expectedIntervalMinutes) gaps.push({ from: rows[i-1].recorded_at, to: rows[i].recorded_at, gapMinutes });
   }
 
-  return { count, avg, min, max, slope_per_hour, gaps };
+  // compute standard deviation
+  const mean = avg;
+  const variance = values.reduce((a,v)=> a + Math.pow(v-mean,2), 0) / Math.max(values.length,1);
+  const stddev = Math.sqrt(variance);
+
+  // classify trend: rising, falling, stable based on slope and stddev
+  const slopeThreshold = opts.slopeThresholdPerHour || 2; // mg/dL per hour
+  let category = 'stable';
+  if (slope_per_hour >= slopeThreshold && Math.abs(slope_per_hour) > stddev * 0.1) category = 'rising';
+  if (slope_per_hour <= -slopeThreshold && Math.abs(slope_per_hour) > stddev * 0.1) category = 'falling';
+
+  return { count, avg, min, max, slope_per_hour, stddev, category, gaps };
 }
 
 module.exports = { computeTrends };
