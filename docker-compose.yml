@@ -1,35 +1,3 @@
-version: '3.8'
-services:
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: dmonitor
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
-  redis:
-    image: redis:7
-    ports:
-      - 6379:6379
-
-  backend:
-    build: ./backend
-    ports:
-      - 3000:3000
-    env_file:
-      - ./backend/.env.example
-    depends_on:
-      - db
-      - redis
-
-volumes:
-  db-data:
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -41,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dmonitor -d dmonitor"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
     image: redis:7
@@ -48,6 +21,28 @@ services:
       - "6379:6379"
     volumes:
       - redisdata:/data
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DATABASE_URL: postgresql://dmonitor:dmonitor@db:5432/dmonitor
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: replace-me-with-a-secure-secret
+      OPENMRS_BASE_URL: http://localhost:8080/openmrs
+      OPENMRS_USERNAME: admin
+      OPENMRS_PASSWORD: Admin123
+      OPENMRS_GLUCOSE_CONCEPT: some-glucose-concept-uuid
+      OPENMRS_ENCOUNTER_TYPE_UUID: some-encounter-type-uuid
+      OPENMRS_LOCATION_UUID: some-location-uuid
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
 volumes:
   pgdata:

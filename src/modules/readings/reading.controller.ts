@@ -85,7 +85,14 @@ async function ingestReading(payload: ReadingPayload) {
       console.warn('Alert detection/persistence failed', e);
     }
   } else {
-    openmrsSync = { enabled: false, success: true, error: undefined };
+    openmrsSync = {
+      enabled: false,
+      queued: false,
+      attempted: false,
+      success: true,
+      retries: 0,
+      error: undefined,
+    };
   }
 
   try {
@@ -150,7 +157,8 @@ readingRouter.post('/batch', async (req: Request, res: Response) => {
   const results = [] as Array<{
     index: number;
     reading?: unknown;
-    openmrsSync?: { enabled: boolean; success: boolean; error?: string };
+    openmrsSync?: OpenmrsSyncResult;
+    created?: boolean;
     error?: string;
   }>;
 

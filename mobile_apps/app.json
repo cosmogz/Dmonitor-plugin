@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Dmonitor Mobile",
+    "slug": "dmonitor-mobile",
+    "scheme": "dmonitor",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cosmogz.dmonitormobile"
+    },
+    "android": {
+      "package": "com.cosmogz.dmonitormobile",
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "plugins": []
+  }
+}

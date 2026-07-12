@@ -24,6 +24,7 @@ export interface OpenmrsSyncJob {
 }
 
 export interface OpenmrsSyncResult {
+  enabled?: boolean;
   queued: boolean;
   attempted: boolean;
   success: boolean;
