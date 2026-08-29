@@ -55,3 +55,18 @@ export function fetchVersion() {
 export function submitReading(body: unknown) {
   return requestJson<{ message: string; created: boolean; conflict: boolean }>('/api/v1/readings', body);
 }
+export async function fetchDashboardMetrics() {
+  const config = await loadMobileConfig();
+  const response = await fetch(`${config.apiBaseUrl}/api/dashboard/metrics`, {
+    headers: { Authorization: `Bearer ${config.apiToken}` },
+  });
+  return response.json();
+}
+
+export async function fetchLatestReading() {
+  const config = await loadMobileConfig();
+  const response = await fetch(`${config.apiBaseUrl}/api/readings/latest`, {
+    headers: { Authorization: `Bearer ${config.apiToken}` },
+  });
+  return response.json();
+}
